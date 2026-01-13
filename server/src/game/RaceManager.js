@@ -97,7 +97,7 @@ class RaceManager {
             influence: this.state.influence
         });
 
-        if (activeRacers && allFinished) {
+        if (Object.keys(this.state.racers).length > 0 && allFinished) {
             this.endRace();
         }
     }
@@ -129,6 +129,13 @@ class RaceManager {
                 this.startRace();
             }
         }, 1000);
+    }
+
+    resetTimer() {
+        if (this.state.phase === 'lobby') {
+            this.state.timer = DEFAULT_LOBBY_TIMER;
+            this.io.emit('timer_update', this.state.timer);
+        }
     }
 
     startRace() {
@@ -170,10 +177,21 @@ class RaceManager {
             rankings: this.state.rankings
         });
 
-        // Auto reset
-        setTimeout(() => {
-            this.startLobby();
-        }, DEFAULT_RESET_TIMER * 1000);
+        // Start Result Countdown
+        this.timerInterval = setInterval(() => {
+            if (this.state.phase !== 'results') {
+                clearInterval(this.timerInterval);
+                return;
+            }
+
+            this.state.timer--;
+            this.io.emit('timer_update', this.state.timer);
+
+            if (this.state.timer <= 0) {
+                clearInterval(this.timerInterval);
+                this.startLobby();
+            }
+        }, 1000);
     }
 
     // --- External Events ---
@@ -185,21 +203,34 @@ class RaceManager {
     }
 
     handleChatMessage(user, message) {
-        // Parse for country codes
-        // Simple regex for now, can be improved
-        // Assume message is just country code or contains it
-        // For MVP: Check if message starts with country code (3 letters)
-        const code = message.substring(0, 3).toUpperCase();
-        // Validate against allowed countries list (TODO)
+        // Normalize message
+        const text = message.trim().toLowerCase();
+
+        let foundCode = null;
+
+        // Smart matching against Country Config
+        const COUNTRIES = require('../config/countries');
+        for (const [code, details] of Object.entries(COUNTRIES)) {
+            // Check keywords
+            if (details.keywords.some(k => text === k || text.startsWith(k + ' '))) {
+                foundCode = code;
+                break;
+            }
+        }
+
+        // Fallback: Check if message is exactly 3 letters and is a valid code key
+        if (!foundCode && text.length === 3 && COUNTRIES[text.toUpperCase()]) {
+            foundCode = text.toUpperCase();
+        }
+
+        if (!foundCode) return; // No match found
 
         if (this.state.phase === 'lobby') {
-            this.handleVote(code);
+            this.handleVote(foundCode);
         } else if (this.state.phase === 'racing') {
             // Add influence
-            // TODO: Check if this country is actually racing
-            if (this.state.racers[code]) {
-                this.state.influence[code] = (this.state.influence[code] || 0) + 1;
-                // io emit happens in update loop
+            if (this.state.racers[foundCode]) {
+                this.state.influence[foundCode] = (this.state.influence[foundCode] || 0) + 1;
             }
         }
     }

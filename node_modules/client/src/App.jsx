@@ -6,7 +6,7 @@ import Results from './components/Results';
 import SettingsModal from './components/SettingsModal';
 
 const GameContainer = () => {
-    const { gameState } = useGame();
+    const { gameState, isConnected } = useGame();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const openSettings = () => setIsSettingsOpen(true);
@@ -14,21 +14,29 @@ const GameContainer = () => {
 
     // Render based on phase
     const renderPhase = () => {
-        if (gameState.phase === 'lobby') {
-            return <Lobby onOpenSettings={openSettings} />;
-        } else if (gameState.phase === 'racing') {
-            return <RaceView onOpenSettings={openSettings} />;
-        } else if (gameState.phase === 'results') {
-            return <Results onOpenSettings={openSettings} />;
+        switch (gameState.phase) {
+            case 'lobby': return <Lobby onOpenSettings={openSettings} />;
+            case 'racing': return <RaceView onOpenSettings={openSettings} />;
+            case 'results': return <Results onOpenSettings={openSettings} />;
+            default: return <div className="text-white p-10">Unknown Game Phase: {gameState.phase}</div>;
         }
-        return null;
     };
 
     return (
-        <>
+        <div className="relative w-full h-full">
             {renderPhase()}
             <SettingsModal isOpen={isSettingsOpen} onClose={closeSettings} />
-        </>
+
+            {/* Debug Overlay */}
+            {!isConnected && (
+                <div className="absolute top-0 left-0 bg-red-600 text-white p-2 font-bold z-50">
+                    Disconnected
+                </div>
+            )}
+            <div className="absolute bottom-0 right-0 bg-black/50 text-white text-xs p-1 pointer-events-none z-50">
+                Phase: {gameState.phase} | Timer: {gameState.timer}
+            </div>
+        </div>
     );
 };
 

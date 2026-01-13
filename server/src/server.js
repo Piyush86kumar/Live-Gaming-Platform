@@ -65,6 +65,14 @@ io.on('connection', (socket) => {
     raceManager.startRace();
   });
 
+  socket.on('admin_reset_race', () => {
+    raceManager.startLobby();
+  });
+
+  socket.on('admin_reset_timer', () => {
+    raceManager.resetTimer();
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });

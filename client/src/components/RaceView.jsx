@@ -1,6 +1,7 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { COUNTRIES } from '../utils/countries';
+import CountryMarquee from './CountryMarquee';
 
 // Assets placeholders
 // In a real app, pre-load images
@@ -9,8 +10,9 @@ const CAR_HEIGHT = 30;
 
 const RaceView = (props) => {
     const canvasRef = useRef(null);
-    const { gameState, voteCountry } = useGame();
+    const { gameState, voteCountry, adminResetRace } = useGame();
     const { racers, influence } = gameState;
+    const [showConfirm, setShowConfirm] = useState(false);
 
     // Helper to draw track
     const drawTrack = (ctx, width, height) => {
@@ -36,14 +38,23 @@ const RaceView = (props) => {
         }
 
         // Finish Line
-        const finishX = width - 100;
+        // Must match the race length mapping: 1500 units -> (width - 150)
+        // trackStart (50) + 1500 * scale = width - 150
+        const finishX = width - 150;
+        const finishWidth = 40; // 2 squares wide
         const squareSize = 20;
+
+        // Draw checkered pattern vertically across all lanes
         for (let y = 40; y < height; y += squareSize) {
-            for (let x = finishX; x < finishX + 40; x += squareSize) {
-                ctx.fillStyle = ((x + y) / squareSize) % 2 === 0 ? 'white' : 'black';
+            for (let x = finishX; x < finishX + finishWidth; x += squareSize) {
+                const row = Math.floor(y / squareSize);
+                const col = Math.floor(x / squareSize);
+                ctx.fillStyle = (row + col) % 2 === 0 ? 'white' : 'black';
                 ctx.fillRect(x, y, squareSize, squareSize);
             }
         }
+
+        return finishX; // return x for debug if needed
     };
 
     // Helper to draw car
@@ -110,17 +121,7 @@ const RaceView = (props) => {
         render();
 
         return () => cancelAnimationFrame(animationFrameId);
-    }, [racers, influence]); // Re-bind if racers object reference changes heavily, but mostly relies on ref access if we used refs. 
-    // Since racers is state, it triggers re-render of component, which updates effect. 
-    // Logic inside render loop usually reads from mutable ref for smooth anim, 
-    // but with React state updates triggering re-renders, correct way is 
-    // to just draw current state. 60FPS from server means 60 state updates per sec? 
-    // That might overwhelm React. 
-    // Ideally we use a ref for racers that gets updated without re-render, 
-    // and requestAnimationFrame loop reads that ref.
-    // But for MVP, let's see if React can handle 60Hz re-renders. (It usually can't smoothly).
-    // Optimization: Use a Ref for racersState in GameContext to avoid widespread re-renders, 
-    // or just accept it might be 30fps effectively.
+    }, [racers, influence]); // Re-bind if racers object reference changes heavily
 
     // Resize handling
     useEffect(() => {
@@ -135,39 +136,59 @@ const RaceView = (props) => {
         return () => window.removeEventListener('resize', resize);
     }, []);
 
+    const handleHomeClick = () => {
+        setShowConfirm(true);
+    };
+
+    const confirmReset = () => {
+        adminResetRace();
+        setShowConfirm(false);
+    };
+
+    const cancelReset = () => {
+        setShowConfirm(false);
+    };
+
     return (
         <div className="flex flex-col h-full bg-slate-800">
             {/* Header */}
-            <div className="flex justify-between items-center px-4 py-2 bg-[#5D9CEC]">
-                <button className="text-2xl">🏠</button>
+            <div className="flex justify-between items-center px-4 py-2 bg-[#5D9CEC] flex-shrink-0">
+                <button onClick={handleHomeClick} className="text-4xl hover:scale-110 transition-transform">🏠</button>
                 <h1 className="text-3xl font-black text-yellow-400 italic"
                     style={{ WebkitTextStroke: '1px #B8860B' }}>
-                    Race in Progress
+                    Race of Nations
                 </h1>
-                <button onClick={props.onOpenSettings} className="text-2xl hover:scale-110 transition-transform">⚙️</button>
+                <button onClick={props.onOpenSettings} className="text-4xl hover:scale-110 transition-transform">⚙️</button>
             </div>
 
             {/* Canvas */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative overflow-hidden">
                 <canvas ref={canvasRef} className="block w-full h-full" />
+
+                {/* Confirmation Modal */}
+                {showConfirm && (
+                    <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-50">
+                        <div className="bg-white text-black p-6 rounded-lg shadow-xl text-center border-4 border-yellow-400">
+                            <h3 className="text-2xl font-bold mb-6">End Race & Return to Lobby?</h3>
+                            <div className="flex gap-6 justify-center">
+                                <button
+                                    onClick={confirmReset}
+                                    className="bg-red-500 text-white px-8 py-3 rounded font-bold hover:bg-red-600 border-2 border-red-700 shadow-lg text-lg">
+                                    YES
+                                </button>
+                                <button
+                                    onClick={cancelReset}
+                                    className="bg-gray-500 text-white px-8 py-3 rounded font-bold hover:bg-gray-600 border-2 border-gray-700 shadow-lg text-lg">
+                                    NO
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
-            {/* Bottom Bar */}
-            <div className="bg-black text-white p-4">
-                <p className="text-center text-xl font-bold mb-4">Chat country code to boost!</p>
-                <div className="flex justify-center gap-6 overflow-x-auto pb-2">
-                    {Object.keys(racers).map(code => (
-                        <button
-                            key={code}
-                            onClick={() => voteCountry(code)}
-                            className="flex flex-col items-center gap-1 hover:scale-110 transition-transform"
-                        >
-                            <img src={COUNTRIES[code]?.flag} alt={code} className="w-16 h-10 object-cover border border-white" />
-                            <span className="font-bold">{code}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
+            {/* Bottom Bar - Marquee Reused */}
+            <CountryMarquee title="Enter your country name/ code to boost your car" />
         </div>
     );
 };

@@ -106,8 +106,16 @@ export const GameProvider = ({ children }) => {
         socket.emit('admin_start_race');
     };
 
+    const adminResetRace = () => {
+        socket.emit('admin_reset_race');
+    };
+
+    const adminResetTimer = () => {
+        socket.emit('admin_reset_timer');
+    };
+
     return (
-        <GameContext.Provider value={{ gameState, isConnected, voteCountry, adminStartRace }}>
+        <GameContext.Provider value={{ gameState, isConnected, voteCountry, adminStartRace, adminResetRace, adminResetTimer }}>
             {children}
         </GameContext.Provider>
     );

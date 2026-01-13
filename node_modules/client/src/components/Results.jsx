@@ -3,8 +3,8 @@ import { useGame } from '../context/GameContext';
 import { COUNTRIES } from '../utils/countries';
 
 const Results = ({ onOpenSettings }) => {
-    const { gameState } = useGame();
-    const { winner, rankings } = gameState;
+    const { gameState, adminResetRace } = useGame();
+    const { winner, rankings, timer } = gameState;
 
     const winnerData = COUNTRIES[winner] || { name: winner, flag: null };
 
@@ -27,33 +27,42 @@ const Results = ({ onOpenSettings }) => {
                     <h2 className="text-5xl font-bold text-white mt-4 text-center relative z-10 drop-shadow-md">{winnerData.name}</h2>
                 </div>
 
-                <div className="mt-12">
-                    <p className="text-pink-500 font-bold text-2xl">Race reset in 00:30</p>
+                <div className="mt-12 flex flex-col items-center gap-4">
+                    <p className="text-pink-500 font-bold text-2xl">Race reset in 00:{timer.toString().padStart(2, '0')}</p>
+
+                    <button
+                        onClick={adminResetRace}
+                        className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded shadow-lg border-2 border-green-700 hover:scale-105 transition-transform text-xl">
+                        Restart Race
+                    </button>
                 </div>
             </div>
 
             {/* Leaderboard Panel */}
-            <div className="w-1/3 bg-gray-200 rounded-lg p-4 shadow-xl border-2 border-gray-400">
-                <h3 className="text-2xl font-bold text-black border-b-2 border-gray-400 pb-2 mb-4">Leaderboard</h3>
-                <div className="bg-white rounded h-full overflow-y-auto">
+            <div className="w-1/3 bg-gray-800 rounded-lg p-4 shadow-xl border-2 border-gray-600 flex flex-col">
+                <h3 className="text-2xl font-bold text-white border-b-2 border-gray-600 pb-2 mb-4">Leaderboard</h3>
+                <div className="bg-gray-100 rounded flex-1 overflow-y-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-gray-100">
+                        <thead className="bg-gray-200">
                             <tr>
-                                <th className="p-3">Country</th>
-                                <th className="p-3 text-right">Total Wins</th>
+                                <th className="p-3 font-bold text-gray-700">Rank</th>
+                                <th className="p-3 font-bold text-gray-700">Country</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {/* Mock historical leaderboard for now, or use rankings */}
                             {rankings.map((r, i) => (
-                                <tr key={i} className={`border-b ${r.country === winner ? 'bg-yellow-100' : ''}`}>
-                                    <td className="p-3 flex items-center gap-2">
-                                        {COUNTRIES[r.country] && <img src={COUNTRIES[r.country].flag} className="w-8 h-6" />}
-                                        {r.country}
+                                <tr key={i} className={`border-b ${r.country === winner ? 'bg-yellow-200' : 'even:bg-gray-50'}`}>
+                                    <td className="p-3 font-bold text-gray-600">
+                                        {i === 0 ? '🏆 1st' : ''}
+                                        {i === 1 ? '🥈 2nd' : ''}
+                                        {i === 2 ? '🥉 3rd' : ''}
+                                        {i > 2 ? `#${i + 1}` : ''}
                                     </td>
-                                    <td className="p-3 text-right">
-                                        {/* Currently we don't persist wins, so just show ranking pos */}
-                                        #{i + 1}
+                                    <td className="p-3 flex items-center gap-3">
+                                        {COUNTRIES[r.country] && (
+                                            <img src={COUNTRIES[r.country].flag} className="w-10 h-6 object-cover border border-gray-300 shadow-sm" alt={r.country} />
+                                        )}
+                                        <span className="font-bold text-gray-800 text-lg">{COUNTRIES[r.country] ? COUNTRIES[r.country].name : r.country}</span>
                                     </td>
                                 </tr>
                             ))}
