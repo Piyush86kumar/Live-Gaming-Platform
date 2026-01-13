@@ -1,0 +1,23 @@
+{
+  "name": "race-of-nations",
+  "version": "1.0.0",
+  "description": "Live Interactive Racing Game",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
+    "start:server": "npm run dev --workspace=server",
+    "start:client": "npm run dev --workspace=client",
+    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "install:all": "npm install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
