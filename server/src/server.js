@@ -73,11 +73,19 @@ io.on('connection', (socket) => {
     raceManager.resetTimer();
   });
 
+  socket.on('admin_reset_session', () => {
+    const DataManager = require('./game/DataManager');
+    DataManager.resetSession();
+    // Optionally emit an update if we want clients to refresh immediately, 
+    // but typically this happens on next race finish or we could emit a toast.
+    console.log('Admin reset session stats');
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
 });
 
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`[Server] ${new Date().toISOString()} - Race of Nations Server running on port ${PORT} (PID: ${process.pid})`);
 });

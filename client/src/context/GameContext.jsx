@@ -14,7 +14,8 @@ export const GameProvider = ({ children }) => {
         influence: {},
         obstacles: [],
         winner: null,
-        rankings: []
+        rankings: [],
+        sessionTop10: []
     });
 
     const [isConnected, setIsConnected] = useState(socket.connected);
@@ -70,7 +71,9 @@ export const GameProvider = ({ children }) => {
                 ...prev,
                 phase: 'results',
                 winner: data.winner,
-                rankings: data.rankings
+                rankings: data.rankings,
+                sessionTop10: data.sessionTop10 || [],
+                timer: data.timer || 0
             }));
         }
 
@@ -114,8 +117,12 @@ export const GameProvider = ({ children }) => {
         socket.emit('admin_reset_timer');
     };
 
+    const adminResetSession = () => {
+        socket.emit('admin_reset_session');
+    };
+
     return (
-        <GameContext.Provider value={{ gameState, isConnected, voteCountry, adminStartRace, adminResetRace, adminResetTimer }}>
+        <GameContext.Provider value={{ gameState, isConnected, voteCountry, adminStartRace, adminResetRace, adminResetTimer, adminResetSession }}>
             {children}
         </GameContext.Provider>
     );

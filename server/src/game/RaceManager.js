@@ -7,6 +7,8 @@ const {
     BOOST_MULTIPLIER_DEFAULT
 } = require('../config/constants');
 const Physics = require('./Physics');
+const DataManager = require('./DataManager');
+const COUNTRIES = require('../config/countries');
 
 class RaceManager {
     constructor(io) {
@@ -14,12 +16,14 @@ class RaceManager {
         this.state = {
             phase: 'lobby', // lobby, racing, results
             timer: DEFAULT_LOBBY_TIMER,
-            racers: {}, // { 'USA': { position: 0, speed: 0, finished: false, ... } }
-            votes: {}, // { 'USA': 10, 'IND': 5 } - Lobby votes
-            influence: {}, // { 'USA': 100 } - Racing influence
+            timerEndsAt: 0,
+            racers: {},
+            votes: {},
+            influence: {},
             obstacles: [],
             winner: null,
-            rankings: []
+            rankings: [],
+            sessionTop10: []
         };
 
         this.settings = {
@@ -29,10 +33,12 @@ class RaceManager {
 
         this.loopInterval = null;
         this.lastUpdateTime = Date.now();
+        this.phaseStartedAt = Date.now(); // To prevent immediate transitions
     }
 
     init() {
-        this.startLobby();
+        console.log('[Init] RaceManager initializing...');
+        this.startLobby('initialization');
         this.startGameLoop();
     }
 
@@ -45,39 +51,56 @@ class RaceManager {
 
     update() {
         const now = Date.now();
-        const deltaTime = (now - this.lastUpdateTime) / 1000;
-        this.lastUpdateTime = now;
 
-        if (this.state.phase === 'lobby') {
-            // Timer logic handles elsewhere via second-interval or tick check
-            // For simplicity, we'll decrement timer 
-            // But usually timers are best handled by separate interval to avoid drift, 
-            // or just trust the tick for now.
-        } else if (this.state.phase === 'racing') {
+        // Handle Timer-based transitions
+        if (this.state.phase === 'lobby' || this.state.phase === 'results') {
+            const remaining = Math.max(0, Math.ceil((this.state.timerEndsAt - now) / 1000));
+
+            // Sync client if timer changed
+            if (remaining !== this.state.timer) {
+                this.state.timer = remaining;
+                this.io.emit('timer_update', this.state.timer);
+            }
+
+            // Expiration check (with 2s safety lock since phase started)
+            if (remaining <= 0 && (now - this.phaseStartedAt) > 2000) {
+                console.log(`[Timer] Expired for Phase: ${this.state.phase}`);
+                if (this.state.phase === 'lobby') {
+                    this.startRace();
+                } else if (this.state.phase === 'results') {
+                    this.startLobby('timer_expired');
+                }
+            }
+        }
+
+        // Handle Racing physics
+        if (this.state.phase === 'racing') {
             this.updateRaceLogic();
         }
+
+        this.lastUpdateTime = now;
     }
 
     // Called constantly during racing phase
     updateRaceLogic() {
-        let allFinished = true;
-        let activeRacers = false;
+        if (this.state.phase !== 'racing') return;
 
-        for (const [country, racer] of Object.entries(this.state.racers)) {
+        let allFinished = true;
+        const racerEntries = Object.entries(this.state.racers);
+        if (racerEntries.length === 0) return;
+
+        for (const [country, racer] of racerEntries) {
             if (!racer.finished) {
                 allFinished = false;
-                activeRacers = true;
 
-                // correct speed calc
                 const speed = Physics.calculateSpeed(
                     this.settings.baseSpeed,
                     this.state.influence[country] || 0,
                     this.settings.boostMultiplier
                 );
 
-                // Apply speed (pixels per frame)
                 racer.position += speed;
-                racer.speed = speed; // Sync for client
+                racer.speed = speed;
 
                 if (racer.position >= RACE_LENGTH) {
                     racer.finished = true;
@@ -86,7 +109,7 @@ class RaceManager {
 
                     if (!this.state.winner) {
                         this.state.winner = country;
-                        // Trigger win music/event?
+                        console.log(`[Race] Winner declared: ${country}`);
                     }
                 }
             }
@@ -97,68 +120,85 @@ class RaceManager {
             influence: this.state.influence
         });
 
-        if (Object.keys(this.state.racers).length > 0 && allFinished) {
+        if (allFinished) {
+            console.log('[Race] All racers finished. Transitioning to endRace.');
             this.endRace();
         }
     }
 
-    startLobby() {
+    startLobby(reason = 'unknown') {
+        const now = Date.now();
+        console.log(`[Phase] Transitioning to LOBBY. Reason: ${reason}`);
+
         this.state.phase = 'lobby';
         this.state.timer = DEFAULT_LOBBY_TIMER;
+        this.state.timerEndsAt = now + (DEFAULT_LOBBY_TIMER * 1000);
+        this.phaseStartedAt = now;
+
         this.state.racers = {};
         this.state.votes = {};
         this.state.influence = {};
         this.state.winner = null;
         this.state.rankings = [];
 
+        console.log(`[Phase] Lobby set. Timer: ${this.state.timer}, EndsAt: ${this.state.timerEndsAt}`);
+
         this.io.emit('phase_change', 'lobby');
         this.io.emit('lobby_update', this.state);
-
-        // Start Countdown
-        this.timerInterval = setInterval(() => {
-            if (this.state.phase !== 'lobby') {
-                clearInterval(this.timerInterval);
-                return;
-            }
-
-            this.state.timer--;
-            this.io.emit('timer_update', this.state.timer);
-
-            if (this.state.timer <= 0) {
-                clearInterval(this.timerInterval);
-                this.startRace();
-            }
-        }, 1000);
     }
 
     resetTimer() {
         if (this.state.phase === 'lobby') {
+            const now = Date.now();
+            console.log('[Action] Admin reset lobby timer');
             this.state.timer = DEFAULT_LOBBY_TIMER;
+            this.state.timerEndsAt = now + (DEFAULT_LOBBY_TIMER * 1000);
             this.io.emit('timer_update', this.state.timer);
         }
     }
 
     startRace() {
-        // Determine top 8 countries or use voting
-        const countries = Object.keys(this.state.votes).length > 0
-            ? Object.keys(this.state.votes)
-            : ['USA', 'CHN', 'IND', 'GBR', 'JPN', 'GER', 'FRA', 'BRA']; // Defaults if empty
+        const now = Date.now();
+        console.log('[Phase] Transitioning to RACING');
 
-        // Select top 8 if more
-        const selectedCountries = countries.slice(0, 8);
+        const MIN_RACERS = 8;
+
+        let selectedCountries = Object.keys(this.state.votes).sort((a, b) => {
+            return (this.state.votes[b] || 0) - (this.state.votes[a] || 0);
+        });
+
+        if (selectedCountries.length > MIN_RACERS) {
+            selectedCountries = selectedCountries.slice(0, MIN_RACERS);
+        }
+
+        if (selectedCountries.length < MIN_RACERS) {
+            const allCodes = Object.keys(COUNTRIES);
+            const available = allCodes.filter(code => !selectedCountries.includes(code));
+
+            // Fisher-Yates shuffle
+            for (let i = available.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [available[i], available[j]] = [available[j], available[i]];
+            }
+
+            const needed = MIN_RACERS - selectedCountries.length;
+            selectedCountries = selectedCountries.concat(available.slice(0, needed));
+        }
 
         this.state.phase = 'racing';
+        this.phaseStartedAt = now;
 
         selectedCountries.forEach(code => {
             this.state.racers[code] = {
                 position: 0,
                 baseSpeed: this.settings.baseSpeed,
                 finished: false,
-                lane: 0 // Will assign proper lane indices in client or here
+                lane: 0
             };
-            // Initial influence from votes? optional
             this.state.influence[code] = this.state.votes[code] || 0;
         });
+
+        console.log(`[Phase] Race started with ${selectedCountries.length} countries`);
 
         this.io.emit('phase_change', 'racing');
         this.io.emit('race_start', {
@@ -168,67 +208,75 @@ class RaceManager {
     }
 
     endRace() {
+        const now = Date.now();
+        if (this.state.phase !== 'racing') {
+            console.log(`[Warning] endRace attempt blocked. Current phase: ${this.state.phase}`);
+            return;
+        }
+
+        console.log(`[Phase] Transitioning to RESULTS. Winner: ${this.state.winner}. DEFAULT_RESET_TIMER from config is: ${DEFAULT_RESET_TIMER}`);
+
         this.state.phase = 'results';
         this.state.timer = DEFAULT_RESET_TIMER;
+        this.state.timerEndsAt = now + (DEFAULT_RESET_TIMER * 1000);
+        this.phaseStartedAt = now;
+
+        let sessionTop10 = [];
+        try {
+            if (this.state.winner) {
+                DataManager.recordWin(this.state.winner);
+            }
+            sessionTop10 = DataManager.getSessionTop10();
+            this.state.sessionTop10 = sessionTop10;
+        } catch (err) {
+            console.error('[Error] DataManager failed in endRace:', err);
+        }
+
+        console.log(`[Phase] Results Active. Timer: ${this.state.timer}, EndsAt: ${this.state.timerEndsAt}`);
 
         this.io.emit('phase_change', 'results');
         this.io.emit('race_finished', {
             winner: this.state.winner,
-            rankings: this.state.rankings
+            rankings: this.state.rankings,
+            sessionTop10: sessionTop10,
+            timer: this.state.timer
         });
-
-        // Start Result Countdown
-        this.timerInterval = setInterval(() => {
-            if (this.state.phase !== 'results') {
-                clearInterval(this.timerInterval);
-                return;
-            }
-
-            this.state.timer--;
-            this.io.emit('timer_update', this.state.timer);
-
-            if (this.state.timer <= 0) {
-                clearInterval(this.timerInterval);
-                this.startLobby();
-            }
-        }, 1000);
     }
 
     // --- External Events ---
 
     handleVote(country) {
-        if (this.state.phase !== 'lobby') return;
-        this.state.votes[country] = (this.state.votes[country] || 0) + 1;
-        this.io.emit('votes_update', this.state.votes);
+        if (this.state.phase === 'lobby') {
+            this.state.votes[country] = (this.state.votes[country] || 0) + 1;
+            this.io.emit('votes_update', this.state.votes);
+        } else if (this.state.phase === 'racing') {
+            // Check if country is actually racing
+            if (this.state.racers[country] && !this.state.racers[country].finished) {
+                this.state.influence[country] = (this.state.influence[country] || 0) + 1;
+            }
+        }
     }
 
     handleChatMessage(user, message) {
-        // Normalize message
         const text = message.trim().toLowerCase();
-
         let foundCode = null;
 
-        // Smart matching against Country Config
-        const COUNTRIES = require('../config/countries');
         for (const [code, details] of Object.entries(COUNTRIES)) {
-            // Check keywords
             if (details.keywords.some(k => text === k || text.startsWith(k + ' '))) {
                 foundCode = code;
                 break;
             }
         }
 
-        // Fallback: Check if message is exactly 3 letters and is a valid code key
         if (!foundCode && text.length === 3 && COUNTRIES[text.toUpperCase()]) {
             foundCode = text.toUpperCase();
         }
 
-        if (!foundCode) return; // No match found
+        if (!foundCode) return;
 
         if (this.state.phase === 'lobby') {
             this.handleVote(foundCode);
         } else if (this.state.phase === 'racing') {
-            // Add influence
             if (this.state.racers[foundCode]) {
                 this.state.influence[foundCode] = (this.state.influence[foundCode] || 0) + 1;
             }
