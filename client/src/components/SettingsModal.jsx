@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 
 const SettingsModal = ({ isOpen, onClose }) => {
-    const { gameState } = useGame(); // In real app, we'd emit update_settings
+    const { gameState, adminResetSession } = useGame(); // In real app, we'd emit update_settings
     const [activeTab, setActiveTab] = useState('race');
 
     if (!isOpen) return null;
@@ -66,7 +66,23 @@ const SettingsModal = ({ isOpen, onClose }) => {
                             </div>
                             <div className="flex justify-between">
                                 <span>Race reset timer =</span>
-                                <span className="font-bold">30</span>
+                                <span className="font-bold">60</span>
+                            </div>
+
+                            <hr className="border-gray-300 my-4" />
+
+                            <div className="flex justify-between items-center">
+                                <span>Session Stats:</span>
+                                <button
+                                    onClick={() => {
+                                        if (window.confirm('Are you sure you want to reset the session stats? This cannot be undone.')) {
+                                            adminResetSession();
+                                        }
+                                    }}
+                                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-bold shadow"
+                                >
+                                    Reset Session Stats
+                                </button>
                             </div>
                         </div>
                     )}

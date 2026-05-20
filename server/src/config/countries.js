@@ -1,5 +1,7 @@
 module.exports = {
-    // 1. Top Gaming/Streaming Markets
+    // ═══════════════════════════════════════════════════════════
+    // 1. TOP GAMING / STREAMING MARKETS
+    // ═══════════════════════════════════════════════════════════
     USA: { name: 'USA', keywords: ['usa', 'us', 'united states', 'america'] },
     CHN: { name: 'China', keywords: ['chn', 'cn', 'china', 'prc'] },
     JPN: { name: 'Japan', keywords: ['jpn', 'jp', 'japan', 'nihon'] },
@@ -11,7 +13,9 @@ module.exports = {
     RUS: { name: 'Russia', keywords: ['rus', 'ru', 'russia'] },
     IND: { name: 'India', keywords: ['ind', 'in', 'india', 'hindustan'] },
 
-    // 2. High Engagement / Esports
+    // ═══════════════════════════════════════════════════════════
+    // 2. HIGH ENGAGEMENT / ESPORTS
+    // ═══════════════════════════════════════════════════════════
     CAN: { name: 'Canada', keywords: ['can', 'ca', 'canada'] },
     ESP: { name: 'Spain', keywords: ['esp', 'es', 'spain', 'espana'] },
     ITA: { name: 'Italy', keywords: ['ita', 'it', 'italy', 'italia'] },
@@ -23,25 +27,71 @@ module.exports = {
     SWE: { name: 'Sweden', keywords: ['swe', 'se', 'sweden'] },
     NED: { name: 'Netherlands', keywords: ['ned', 'nl', 'netherlands', 'holland'] },
 
-    // 3. SEA & Growth
+    // ═══════════════════════════════════════════════════════════
+    // 3. SEA & SOUTH ASIA — MASSIVE SOCIAL MEDIA GROWTH
+    // ═══════════════════════════════════════════════════════════
     IDN: { name: 'Indonesia', keywords: ['idn', 'id', 'indonesia', 'indo'] },
     PHL: { name: 'Philippines', keywords: ['phl', 'ph', 'philippines', 'pinoy'] },
     THA: { name: 'Thailand', keywords: ['tha', 'th', 'thailand', 'thai'] },
     VNM: { name: 'Vietnam', keywords: ['vnm', 'vn', 'vietnam', 'viet'] },
     MYS: { name: 'Malaysia', keywords: ['mys', 'my', 'malaysia'] },
     SGP: { name: 'Singapore', keywords: ['sgp', 'sg', 'singapore'] },
+    PAK: { name: 'Pakistan', keywords: ['pak', 'pk', 'pakistan'] },
+    BGD: { name: 'Bangladesh', keywords: ['bgd', 'bd', 'bangladesh'] },
+    LKA: { name: 'Sri Lanka', keywords: ['lka', 'lk', 'sri lanka', 'ceylon'] },
+    NPL: { name: 'Nepal', keywords: ['npl', 'np', 'nepal'] },
 
-    // 4. Other Major
+    // ═══════════════════════════════════════════════════════════
+    // 4. MIDDLE EAST & NORTH AFRICA — HIGH SOCIAL PENETRATION
+    // ═══════════════════════════════════════════════════════════
     SAU: { name: 'Saudi Arabia', keywords: ['sau', 'sa', 'saudi', 'ksa'] },
+    ARE: { name: 'UAE', keywords: ['are', 'ae', 'uae', 'dubai'] },
     EGY: { name: 'Egypt', keywords: ['egy', 'eg', 'egypt'] },
+    ISR: { name: 'Israel', keywords: ['isr', 'il', 'israel'] },
+    MAR: { name: 'Morocco', keywords: ['mar', 'ma', 'morocco', 'maghreb'] },
+    IRQ: { name: 'Iraq', keywords: ['irq', 'iq', 'iraq'] },
+    DZA: { name: 'Algeria', keywords: ['dza', 'dz', 'algeria'] },
+    JOR: { name: 'Jordan', keywords: ['jor', 'jo', 'jordan'] },
+    LBN: { name: 'Lebanon', keywords: ['lbn', 'lb', 'lebanon'] },
+    KWT: { name: 'Kuwait', keywords: ['kwt', 'kw', 'kuwait'] },
+    QAT: { name: 'Qatar', keywords: ['qat', 'qa', 'qatar'] },
+    BHR: { name: 'Bahrain', keywords: ['bhr', 'bh', 'bahrain'] },
+
+    // ═══════════════════════════════════════════════════════════
+    // 5. SUB-SAHARAN AFRICA — RAPID GROWTH
+    // ═══════════════════════════════════════════════════════════
     ZAF: { name: 'South Africa', keywords: ['zaf', 'za', 'south africa', 'rsa'] },
-    UKR: { name: 'Ukraine', keywords: ['ukr', 'ua', 'ukraine'] },
+    NGA: { name: 'Nigeria', keywords: ['nga', 'ng', 'nigeria'] },
+    KEN: { name: 'Kenya', keywords: ['ken', 'ke', 'kenya'] },
+    GHA: { name: 'Ghana', keywords: ['gha', 'gh', 'ghana'] },
+    ETH: { name: 'Ethiopia', keywords: ['eth', 'et', 'ethiopia'] },
+    TZA: { name: 'Tanzania', keywords: ['tza', 'tz', 'tanzania'] },
+
+    // ═══════════════════════════════════════════════════════════
+    // 6. EAST ASIA & CENTRAL ASIA
+    // ═══════════════════════════════════════════════════════════
+    TWN: { name: 'Taiwan', keywords: ['twn', 'tw', 'taiwan'] },
+    HKG: { name: 'Hong Kong', keywords: ['hkg', 'hk', 'hong kong'] },
+    KAZ: { name: 'Kazakhstan', keywords: ['kaz', 'kz', 'kazakhstan'] },
+    UZB: { name: 'Uzbekistan', keywords: ['uzb', 'uz', 'uzbekistan'] },
+    AZE: { name: 'Azerbaijan', keywords: ['aze', 'az', 'azerbaijan'] },
+    GEO: { name: 'Georgia', keywords: ['geo', 'ge', 'georgia'] },
+
+    // ═══════════════════════════════════════════════════════════
+    // 7. NORDIC & BALTIC
+    // ═══════════════════════════════════════════════════════════
     DNK: { name: 'Denmark', keywords: ['dnk', 'dk', 'denmark'] },
     FIN: { name: 'Finland', keywords: ['fin', 'fi', 'finland'] },
     NOR: { name: 'Norway', keywords: ['nor', 'no', 'norway'] },
+    ISL: { name: 'Iceland', keywords: ['isl', 'is', 'iceland'] },
+    EST: { name: 'Estonia', keywords: ['est', 'ee', 'estonia'] },
+    LVA: { name: 'Latvia', keywords: ['lva', 'lv', 'latvia'] },
+    LTU: { name: 'Lithuania', keywords: ['ltu', 'lt', 'lithuania'] },
+
+    // ═══════════════════════════════════════════════════════════
+    // 8. REST OF EUROPE
+    // ═══════════════════════════════════════════════════════════
     PRT: { name: 'Portugal', keywords: ['prt', 'pt', 'portugal'] },
-    TWN: { name: 'Taiwan', keywords: ['twn', 'tw', 'taiwan'] },
-    HKG: { name: 'Hong Kong', keywords: ['hkg', 'hk', 'hong kong'] },
     NZL: { name: 'New Zealand', keywords: ['nzl', 'nz', 'new zealand', 'kiwi'] },
     CHE: { name: 'Switzerland', keywords: ['che', 'ch', 'switzerland', 'swiss'] },
     BEL: { name: 'Belgium', keywords: ['bel', 'be', 'belgium'] },
@@ -51,13 +101,20 @@ module.exports = {
     HUN: { name: 'Hungary', keywords: ['hun', 'hu', 'hungary'] },
     ROU: { name: 'Romania', keywords: ['rou', 'ro', 'romania'] },
     IRL: { name: 'Ireland', keywords: ['irl', 'ie', 'ireland'] },
-    PAK: { name: 'Pakistan', keywords: ['pak', 'pk', 'pakistan'] },
-    BGD: { name: 'Bangladesh', keywords: ['bgd', 'bd', 'bangladesh'] },
-    NGA: { name: 'Nigeria', keywords: ['nga', 'ng', 'nigeria'] },
+    HRV: { name: 'Croatia', keywords: ['hrv', 'hr', 'croatia'] },
+    SRB: { name: 'Serbia', keywords: ['srb', 'rs', 'serbia'] },
+    BGR: { name: 'Bulgaria', keywords: ['bgr', 'bg', 'bulgaria'] },
+    SVK: { name: 'Slovakia', keywords: ['svk', 'sk', 'slovakia'] },
+    SVN: { name: 'Slovenia', keywords: ['svn', 'si', 'slovenia'] },
+
+    // ═══════════════════════════════════════════════════════════
+    // 9. LATIN AMERICA — GROWING GAMING & SOCIAL SCENE
+    // ═══════════════════════════════════════════════════════════
     COL: { name: 'Colombia', keywords: ['col', 'co', 'colombia'] },
     CHL: { name: 'Chile', keywords: ['chl', 'cl', 'chile'] },
     PER: { name: 'Peru', keywords: ['per', 'pe', 'peru'] },
     VEN: { name: 'Venezuela', keywords: ['ven', 've', 'venezuela'] },
-    ARE: { name: 'UAE', keywords: ['are', 'ae', 'uae', 'dubai'] },
-    ISR: { name: 'Israel', keywords: ['isr', 'il', 'israel'] }
+    ECU: { name: 'Ecuador', keywords: ['ecu', 'ec', 'ecuador'] },
+    URY: { name: 'Uruguay', keywords: ['ury', 'uy', 'uruguay'] },
+    DOM: { name: 'Dominican Republic', keywords: ['dom', 'do', 'dominican republic', 'dr'] },
 };

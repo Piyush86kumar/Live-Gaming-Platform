@@ -16,6 +16,7 @@ const GameContainer = () => {
     const renderPhase = () => {
         switch (gameState.phase) {
             case 'lobby': return <Lobby onOpenSettings={openSettings} />;
+            case 'countdown':
             case 'racing': return <RaceView onOpenSettings={openSettings} />;
             case 'results': return <Results onOpenSettings={openSettings} />;
             default: return <div className="text-white p-10">Unknown Game Phase: {gameState.phase}</div>;

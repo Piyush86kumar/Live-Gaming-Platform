@@ -68,7 +68,7 @@ const Lobby = ({ onOpenSettings }) => {
                                 <>
                                     <img src={slot.flag} alt={slot.name} className="absolute inset-0 w-full h-full object-cover" />
                                     <div className="absolute inset-x-0 bottom-0 bg-black/50 text-white text-center font-bold py-1">
-                                        {slot.name} ({validVotes[slot.code] || 0})
+                                        {slot.name}
                                     </div>
                                 </>
                             ) : (
@@ -94,7 +94,7 @@ const Lobby = ({ onOpenSettings }) => {
             </div>
 
             {/* Bottom Bar */}
-            <CountryMarquee title="Enter your country name/ code to join the race or boost car" />
+            <CountryMarquee title="Enter your country name/ code to join the race" />
 
             {/* Confirmation Modal */}
             {showConfirm && (

@@ -8,12 +8,10 @@ class Physics {
     }
 
     static checkCollision(racer, obstacle) {
-        // Simple 1D collision for now since lanes are separate
-        // Assuming obstacle has x and width, and checks if racer is within bounds
-        // This might be more complex if we have lane changing or 2D movement later
-        // For now, let's assume obstacles are point-based on the track line
-        const hitDistance = 20; // pixels
-        return Math.abs(racer.position - obstacle.x) < hitDistance;
+        // racer.position is mapped to 0-1500. The car sprite visually extends forward.
+        // We match the client's visual hit box exactly (scaled by 0.25).
+        const dx = (racer.position + 8) - obstacle.x;
+        return Math.abs(dx) < 10;
     }
 }
 

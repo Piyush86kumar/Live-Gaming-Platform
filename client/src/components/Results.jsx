@@ -3,13 +3,13 @@ import { useGame } from '../context/GameContext';
 import { COUNTRIES } from '../utils/countries';
 
 const Results = ({ onOpenSettings }) => {
-    const { gameState, adminResetRace } = useGame();
+    const { gameState, adminResetRace, adminResetSession } = useGame();
     const { winner, rankings, timer } = gameState;
 
     const winnerData = COUNTRIES[winner] || { name: winner, flag: null };
 
     return (
-        <div className="flex w-full h-full bg-[#5D9CEC] p-8 relative">
+        <div className="flex w-full h-full bg-slate-900 p-8 relative">
             <button onClick={onOpenSettings} className="absolute top-4 right-4 text-4xl hover:scale-110 transition-transform z-50">⚙️</button>
             {/* Main Stage */}
             <div className="flex-1 flex flex-col items-center justify-center relative">
@@ -52,10 +52,18 @@ const Results = ({ onOpenSettings }) => {
             </div>
 
             {/* Total Wins Session Panel */}
-            <div className="w-1/3 bg-gray-900 rounded-lg p-4 shadow-xl border-2 border-gray-700 flex flex-col">
-                <h3 className="text-2xl font-bold text-yellow-400 border-b-2 border-gray-700 pb-2 mb-4 flex items-center gap-2">
-                    <span>🏆</span> Today's Top Winners
-                </h3>
+            <div className="w-1/3 bg-gray-900 rounded-xl p-6 shadow-2xl border border-gray-700 flex flex-col backdrop-blur-md bg-opacity-80">
+                <div className="flex justify-between items-center border-b border-gray-700 pb-4 mb-4">
+                    <h3 className="text-2xl font-bold text-yellow-400 flex items-center gap-2">
+                        <span>🏆</span> Today's Top Winners
+                    </h3>
+                    <button 
+                        onClick={adminResetSession} 
+                        className="bg-red-600 hover:bg-red-500 transition-colors text-white text-sm font-bold py-1 px-4 rounded shadow-lg border border-red-700"
+                    >
+                        Reset Stats
+                    </button>
+                </div>
                 <div className="bg-gray-800 rounded flex-1 overflow-y-auto">
                     <table className="w-full text-left">
                         <thead className="bg-gray-700 text-gray-300">

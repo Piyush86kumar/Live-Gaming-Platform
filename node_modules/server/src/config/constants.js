@@ -5,7 +5,7 @@ module.exports = {
     // Race Config
     RACE_LENGTH: 1500, // Pixels
     DEFAULT_LOBBY_TIMER: 60,
-    DEFAULT_RESET_TIMER: 30,
+    DEFAULT_RESET_TIMER: 15,
 
     // Physics
     BASE_SPEED: 1.0,

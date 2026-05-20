@@ -53,7 +53,7 @@ class RaceManager {
         const now = Date.now();
 
         // Handle Timer-based transitions
-        if (this.state.phase === 'lobby' || this.state.phase === 'results') {
+        if (this.state.phase === 'lobby' || this.state.phase === 'results' || this.state.phase === 'countdown') {
             const remaining = Math.max(0, Math.ceil((this.state.timerEndsAt - now) / 1000));
 
             // Sync client if timer changed
@@ -66,6 +66,8 @@ class RaceManager {
             if (remaining <= 0 && (now - this.phaseStartedAt) > 2000) {
                 console.log(`[Timer] Expired for Phase: ${this.state.phase}`);
                 if (this.state.phase === 'lobby') {
+                    this.startCountdown();
+                } else if (this.state.phase === 'countdown') {
                     this.startRace();
                 } else if (this.state.phase === 'results') {
                     this.startLobby('timer_expired');
@@ -93,11 +95,48 @@ class RaceManager {
             if (!racer.finished) {
                 allFinished = false;
 
+                // Deplete influence gradually (lasts longer)
+                if (this.state.influence[country] > 0) {
+                    this.state.influence[country] = Math.max(0, this.state.influence[country] - 0.02);
+                }
+
+                let penaltyMultiplier = 1.0;
+                if (racer.penaltyTimer && racer.penaltyTimer > 0) {
+                    racer.penaltyTimer--;
+                    penaltyMultiplier = racer.speedMultiplier;
+                } else {
+                    racer.penaltyTimer = 0;
+                    racer.speedMultiplier = 1.0;
+                }
+
+                // Check collisions
+                for (const obs of this.state.obstacles) {
+                    if (obs.lane === racer.lane && !obs.hitBy.includes(country)) {
+                        if (Physics.checkCollision(racer, obs)) {
+                            obs.hitBy.push(country);
+                            // Deplete half of the current boost as a penalty
+                            this.state.influence[country] = Math.floor((this.state.influence[country] || 0) * 0.5);
+                            
+                            if (obs.type === 'banana') {
+                                racer.penaltyTimer = 45; // 0.75s
+                                racer.speedMultiplier = 0.3;
+                            } else if (obs.type === 'oil') {
+                                racer.penaltyTimer = 60; // 1s
+                                racer.speedMultiplier = 0.6;
+                            } else if (obs.type === 'rock') {
+                                racer.penaltyTimer = 80; // 1.3s
+                                racer.speedMultiplier = 0.15;
+                            }
+                            penaltyMultiplier = racer.speedMultiplier;
+                        }
+                    }
+                }
+
                 const speed = Physics.calculateSpeed(
                     this.settings.baseSpeed,
                     this.state.influence[country] || 0,
                     this.settings.boostMultiplier
-                );
+                ) * penaltyMultiplier;
 
                 racer.position += speed;
                 racer.speed = speed;
@@ -117,7 +156,8 @@ class RaceManager {
 
         this.io.emit('race_update', {
             racers: this.state.racers,
-            influence: this.state.influence
+            influence: this.state.influence,
+            obstacles: this.state.obstacles
         });
 
         if (allFinished) {
@@ -157,9 +197,9 @@ class RaceManager {
         }
     }
 
-    startRace() {
+    startCountdown() {
         const now = Date.now();
-        console.log('[Phase] Transitioning to RACING');
+        console.log('[Phase] Transitioning to COUNTDOWN');
 
         const MIN_RACERS = 8;
 
@@ -185,27 +225,61 @@ class RaceManager {
             selectedCountries = selectedCountries.concat(available.slice(0, needed));
         }
 
-        this.state.phase = 'racing';
+        this.state.phase = 'countdown';
+        this.state.timer = 3;
+        this.state.timerEndsAt = now + 3000;
         this.phaseStartedAt = now;
 
-        selectedCountries.forEach(code => {
+        this.state.obstacles = [];
+        const types = ['banana', 'oil', 'rock'];
+        const numObstaclesPerLane = 2;
+        for (let lane = 0; lane < selectedCountries.length; lane++) {
+            for (let j = 0; j < numObstaclesPerLane; j++) {
+                const startRange = 200 + (j * 500); // spread across the 1500 length
+                const x = startRange + Math.random() * 400;
+                this.state.obstacles.push({
+                    id: `${lane}-${j}`,
+                    type: types[Math.floor(Math.random() * types.length)],
+                    x: x,
+                    lane: lane,
+                    hitBy: []
+                });
+            }
+        }
+
+        selectedCountries.forEach((code, index) => {
             this.state.racers[code] = {
                 position: 0,
                 baseSpeed: this.settings.baseSpeed,
                 finished: false,
-                lane: 0
+                lane: index,
+                penaltyTimer: 0,
+                speedMultiplier: 1.0
             };
             this.state.influence[code] = this.state.votes[code] || 0;
         });
 
-        console.log(`[Phase] Race started with ${selectedCountries.length} countries`);
+        console.log(`[Phase] Countdown started with ${selectedCountries.length} countries`);
 
-        this.io.emit('phase_change', 'racing');
+        this.io.emit('phase_change', 'countdown');
         this.io.emit('race_start', {
             racers: this.state.racers,
+            obstacles: this.state.obstacles,
             config: { length: RACE_LENGTH }
         });
     }
+
+    startRace() {
+        const now = Date.now();
+        console.log('[Phase] Transitioning to RACING');
+
+        this.state.phase = 'racing';
+        this.phaseStartedAt = now;
+
+        this.io.emit('phase_change', 'racing');
+    }
+
+
 
     endRace() {
         const now = Date.now();

@@ -51,7 +51,6 @@ export const GameProvider = ({ children }) => {
         function onRaceStart(data) {
             setGameState(prev => ({
                 ...prev,
-                phase: 'racing',
                 racers: data.racers,
                 config: data.config
             }));
@@ -77,6 +76,10 @@ export const GameProvider = ({ children }) => {
             }));
         }
 
+        function onSessionUpdate(sessionTop10) {
+            setGameState(prev => ({ ...prev, sessionTop10 }));
+        }
+
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
         socket.on('phase_change', onPhaseChange);
@@ -86,6 +89,7 @@ export const GameProvider = ({ children }) => {
         socket.on('race_start', onRaceStart);
         socket.on('race_update', onRaceUpdate);
         socket.on('race_finished', onRaceFinished);
+        socket.on('session_update', onSessionUpdate);
 
         return () => {
             socket.off('connect', onConnect);
@@ -97,6 +101,7 @@ export const GameProvider = ({ children }) => {
             socket.off('race_start', onRaceStart);
             socket.off('race_update', onRaceUpdate);
             socket.off('race_finished', onRaceFinished);
+            socket.off('session_update', onSessionUpdate);
         };
     }, []);
 

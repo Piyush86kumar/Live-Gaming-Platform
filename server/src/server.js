@@ -76,8 +76,8 @@ io.on('connection', (socket) => {
   socket.on('admin_reset_session', () => {
     const DataManager = require('./game/DataManager');
     DataManager.resetSession();
-    // Optionally emit an update if we want clients to refresh immediately, 
-    // but typically this happens on next race finish or we could emit a toast.
+    raceManager.state.sessionTop10 = [];
+    io.emit('session_update', []);
     console.log('Admin reset session stats');
   });
 
