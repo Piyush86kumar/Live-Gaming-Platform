@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';          /* Hook for programmati
 import { Crown } from 'lucide-react';                    /* Icon components for UI elements */
 import { GameHeader } from '@/components/layout/GameHeader';     /* Shared header with navigation buttons */
 import { useGameStore } from '@/hooks/useGameStore';     /* Zustand store for all game state */
-import { MOCK_VOTES, COUNTRIES } from '@/data/mockData';            /* Mock vote data for demonstration */
+import { MOCK_VOTES } from '@/data/mockData';            /* Mock vote data for demonstration */
 
 /* ===== RACE PAGE COMPONENT ===== */
 /* Summary: Displays the race track with lanes, car sprites, a vote-to-boost panel, and finish action. */
@@ -123,27 +123,6 @@ export default function RacePage() {
       >
         FINISH RACE
       </button>
-
-      {/* ----- COUNTRY BANNER ----- */}
-      <div className="banner-section">
-        <h2 className="banner-heading">Choose Your Country</h2>
-        <div className="banner-overflow">
-          <div className="banner-track">
-            {[...COUNTRIES, ...COUNTRIES].map((country, index) => (
-              <div
-                key={`${country.code}-${index}`}
-                className="banner-item"
-              >
-                <CountryFlag countryCode={country.code} className="banner-flag" />
-                <div className="flex flex-col items-center gap-[2px]">
-                  <span className="banner-name">{country.name}</span>
-                  <span className="banner-code">{country.displayCode}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
     </div>
   );

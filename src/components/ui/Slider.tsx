@@ -47,10 +47,10 @@ export function Slider({
         />
         <div
           className="slider-thumb"
-          style={{ left: `${percentage}%` }}    /* Position custom thumb at current value */
+          style={{ left: `${percentage}%` }}
         />
       </div>
-      <span className="slider-value">{value}</span>    /* Display current numeric value */
+      <span className="slider-value">{value}</span>
     </div>
   );
 }

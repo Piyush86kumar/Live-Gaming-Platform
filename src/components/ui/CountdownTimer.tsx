@@ -1,11 +1,9 @@
 /* ===== FILE: CountdownTimer.tsx ===== */
 /* Summary: Displays a countdown timer with MM:SS format, optional label, and completion callback. */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
-/* ===== PROPS INTERFACE ===== */
-/* Summary: seconds = initial countdown value; onComplete = fires when timer hits zero; label = optional text prefix. */
 interface CountdownTimerProps {
   seconds: number;
   className?: string;
@@ -13,26 +11,33 @@ interface CountdownTimerProps {
   label?: string;
 }
 
-/* ===== COMPONENT ===== */
 export function CountdownTimer({ seconds, className, onComplete, label }: CountdownTimerProps) {
-  /* Sync internal timeLeft when parent changes `seconds` prop */
   const [timeLeft, setTimeLeft] = useState(seconds);
+  const loaded = useRef(false);
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
-    setTimeLeft(seconds);    /* Reset timer to new duration on prop change */
+    if (!loaded.current) {
+      loaded.current = true;
+      return;
+    }
+    setTimeLeft(seconds);
   }, [seconds]);
 
-  /* Tick every 1s; fire callback and stop when timeLeft reaches 0 */
   useEffect(() => {
+    if (completedRef.current) return;
     if (timeLeft <= 0) {
-      onComplete?.();       /* Notify parent, no-op if undefined */
+      completedRef.current = true;
+      onCompleteRef.current?.();
       return;
     }
     const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);    /* Decrement by 1 second */
+      setTimeLeft((prev) => prev - 1);
     }, 1000);
-    return () => clearInterval(timer);    /* Cleanup interval on unmount / timer change */
-  }, [timeLeft, onComplete]);
+    return () => clearInterval(timer);
+  }, [timeLeft]);
 
   /* ===== TIME FORMATTING ===== */
   /* Convert raw seconds into zero-padded MM:SS display string */

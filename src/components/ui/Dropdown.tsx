@@ -41,7 +41,7 @@ export function Dropdown({ value, options, onChange, className }: DropdownProps)
         className={`dropdown-trigger ${isOpen ? 'dropdown-trigger--open' : ''}`}
       >
         <span className="dropdown-trigger__label">{selected?.label || value}</span>
-        <ChevronDown className={`dropdown-trigger__arrow ${isOpen ? 'dropdown-trigger__arrow--open' : ''}`} />    /* Rotate arrow when open */
+        <ChevronDown className={`dropdown-trigger__arrow ${isOpen ? 'dropdown-trigger__arrow--open' : ''}`} />
       </button>
 
       {/* ===== DROPDOWN MENU ===== */}
@@ -54,7 +54,7 @@ export function Dropdown({ value, options, onChange, className }: DropdownProps)
                 onChange(option.value);    /* Emit selection */
                 setIsOpen(false);         /* Close menu after selection */
               }}
-              className={`dropdown-option ${option.value === value ? 'dropdown-option--selected' : ''}`}    /* Highlight current selection */
+              className={`dropdown-option ${option.value === value ? 'dropdown-option--selected' : ''}`}
             >
               {option.label}
             </button>

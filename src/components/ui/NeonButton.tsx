@@ -54,7 +54,7 @@ export function NeonButton({
         className
       )}
     >
-      {icon && <span className="flex-shrink-0">{icon}</span>}    /* Render icon before text if provided */
+      {icon && <span className="flex-shrink-0">{icon}</span>}
       {children}
     </button>
   );

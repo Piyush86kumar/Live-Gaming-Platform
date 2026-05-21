@@ -6,39 +6,30 @@
    and per-tab configuration rows using Slider, ToggleSwitch, Dropdown,
    and NeonButton components. */
 
-import { useState } from 'react';                        /* React hook for tracking the active tab */
-import { useNavigate } from 'react-router-dom';          /* Hook for programmatic page navigation */
-import {                                                          /* Icon components grouped by import line */
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
   Volume2, Music, AudioWaveform, Monitor, Flag, Timer, Users, Globe,
   PartyPopper, Trophy, Save, RotateCcw, X, Settings as SettingsIcon,
   Eye, MousePointer
 } from 'lucide-react';
-import { GameBackground } from '@/components/layout/GameBackground'; /* Full-page gradient background wrapper */
-import { GameHeader } from '@/components/layout/GameHeader';         /* Shared game header with nav links */
-import { NeonButton } from '@/components/ui/NeonButton';             /* Neon-styled button component */
-import { Slider } from '@/components/ui/Slider';                     /* Range slider for volume/values */
-import { ToggleSwitch } from '@/components/ui/ToggleSwitch';         /* On/off toggle switch */
-import { Dropdown } from '@/components/ui/Dropdown';                 /* Dropdown selector */
-import { useGameStore } from '@/hooks/useGameStore';    /* Zustand store for all game state */
-import { COUNTRIES } from '@/data/mockData';            /* Static list of available countries */
+import { GameBackground } from '@/components/layout/GameBackground';
+import { GameHeader } from '@/components/layout/GameHeader';
+import { NeonButton } from '@/components/ui/NeonButton';
+import { Slider } from '@/components/ui/Slider';
+import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { useGameStore } from '@/hooks/useGameStore';
+import { COUNTRIES } from '@/data/mockData';
 
-/* ===== TYPE DEFINITIONS ===== */
-/* Summary: Types for tab identification and tab configuration shape. */
-
-/* SettingsTab: Union of all valid tab identifiers */
 type SettingsTab = 'general' | 'audio' | 'display' | 'gameplay' | 'voting' | 'countries' | 'advanced';
 
-/* TabConfig: Shape of a single tab entry in the sidebar */
 interface TabConfig {
-  id: SettingsTab;        /* Unique tab identifier matching the union type */
-  label: string;          /* Human-readable tab label shown in the sidebar */
-  icon: React.ReactNode;  /* Icon component (lucide-react) to display next to the label */
+  id: SettingsTab;
+  label: string;
+  icon: React.ReactNode;
 }
 
-/* ===== CONSTANTS ===== */
-/* Summary: Static configuration for tabs and dropdown options. */
-
-/* TABS: Array of all sidebar tab definitions */
 const TABS: TabConfig[] = [
   { id: 'general',   label: 'General',   icon: <SettingsIcon className="w-5 h-5" /> },
   { id: 'audio',     label: 'Audio',     icon: <Volume2 className="w-5 h-5" /> },
@@ -49,32 +40,25 @@ const TABS: TabConfig[] = [
   { id: 'advanced',  label: 'Advanced',  icon: <AudioWaveform className="w-5 h-5" /> },
 ];
 
-const COUNTDOWN_OPTIONS = [30, 45, 60, 90];           /* Available race countdown durations in seconds */
-const MAX_PLAYERS_OPTIONS = [2, 4, 6, 8];            /* Available max player counts */
+const COUNTDOWN_OPTIONS = [30, 45, 60, 90];
+const MAX_PLAYERS_OPTIONS = [2, 4, 6, 8];
 
-/* ===== SETTINGS PAGE COMPONENT ===== */
-/* Summary: Renders the settings page with a tabbed sidebar, dynamic content panel, and bottom action bar. */
 export default function SettingsPage() {
-  const navigate = useNavigate();                                                      /* Navigation helper for route changes */
-  const { settings, updateSettings, resetSettings } = useGameStore();                  /* Destructure store: current settings, updater, and reset */
-  const [activeTab, setActiveTab] = useState<SettingsTab>('general');                  /* Local state for the currently active tab */
+  const navigate = useNavigate();
+  const { settings, updateSettings, resetSettings } = useGameStore();
+  const [activeTab, setActiveTab] = useState<SettingsTab>('general');
 
-  /* Derived dropdown options from constants and mock data */
-  const countryOptions = COUNTRIES.map(c => ({ value: c.code, label: `${c.name} (${c.code})` })); /* Map countries to {value, label} for Dropdown */
-  const countdownOptions = COUNTDOWN_OPTIONS.map(v => ({ value: v, label: `${v} Seconds` }));      /* Map numbers to dropdown options with "Seconds" suffix */
-  const maxPlayersOptions = MAX_PLAYERS_OPTIONS.map(v => ({ value: v, label: `${v} Players` }));   /* Map numbers to dropdown options with "Players" suffix */
+  const countryOptions = COUNTRIES.map(c => ({ value: c.code, label: `${c.name} (${c.code})` }));
+  const countdownOptions = COUNTDOWN_OPTIONS.map(v => ({ value: v, label: `${v} Seconds` }));
+  const maxPlayersOptions = MAX_PLAYERS_OPTIONS.map(v => ({ value: v, label: `${v} Players` }));
 
-  /* ===== TAB CONTENT RENDERER ===== */
-  /* Summary: Switch on the active tab ID and return the appropriate settings rows. */
   const renderTabContent = () => {
     switch (activeTab) {
 
-      /* ----- GENERAL TAB ----- */
-      /* Summary: Master volume, music volume, sound effects, fullscreen toggle, show flags toggle. */
       case 'general':
         return (
           <div className="settings-content">
-            <SettingsRow                               /* Master Volume slider */
+            <SettingsRow
               icon={<Volume2 className="w-5 h-5" />}
               title="Master Volume"
               subtitle="Control overall audio level"
@@ -86,7 +70,7 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Music Volume slider */
+            <SettingsRow
               icon={<Music className="w-5 h-5" />}
               title="Music Volume"
               subtitle="Background music level"
@@ -98,7 +82,7 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Sound Effects slider */
+            <SettingsRow
               icon={<AudioWaveform className="w-5 h-5" />}
               title="Sound Effects"
               subtitle="Game sound effects volume"
@@ -110,7 +94,7 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Fullscreen Mode toggle */
+            <SettingsRow
               icon={<Monitor className="w-5 h-5" />}
               title="Fullscreen Mode"
               subtitle="Toggle fullscreen display"
@@ -121,7 +105,7 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Show Country Flags toggle */
+            <SettingsRow
               icon={<Flag className="w-5 h-5" />}
               title="Show Country Flags"
               subtitle="Display flags next to player names"
@@ -135,12 +119,10 @@ export default function SettingsPage() {
           </div>
         );
 
-      /* ----- AUDIO TAB ----- */
-      /* Summary: Subset of General — just the three volume sliders. */
       case 'audio':
         return (
           <div className="settings-content">
-            <SettingsRow                               /* Master Volume slider (duplicated from General for convenience) */
+            <SettingsRow
               icon={<Volume2 className="w-5 h-5" />}
               title="Master Volume"
               subtitle="Control overall audio level"
@@ -152,7 +134,7 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Music Volume slider */
+            <SettingsRow
               icon={<Music className="w-5 h-5" />}
               title="Music Volume"
               subtitle="Background music level"
@@ -164,7 +146,7 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Sound Effects slider */
+            <SettingsRow
               icon={<AudioWaveform className="w-5 h-5" />}
               title="Sound Effects"
               subtitle="Game sound effects volume"
@@ -179,12 +161,10 @@ export default function SettingsPage() {
           </div>
         );
 
-      /* ----- DISPLAY TAB ----- */
-      /* Summary: Fullscreen toggle and show country flags toggle. */
       case 'display':
         return (
           <div className="settings-content">
-            <SettingsRow                               /* Fullscreen Mode toggle */
+            <SettingsRow
               icon={<Monitor className="w-5 h-5" />}
               title="Fullscreen Mode"
               subtitle="Toggle fullscreen display"
@@ -195,7 +175,7 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Show Country Flags toggle */
+            <SettingsRow
               icon={<Flag className="w-5 h-5" />}
               title="Show Country Flags"
               subtitle="Display flags next to player names"
@@ -209,12 +189,10 @@ export default function SettingsPage() {
           </div>
         );
 
-      /* ----- GAMEPLAY TAB ----- */
-      /* Summary: Race countdown duration, max players, default country dropdowns. */
       case 'gameplay':
         return (
           <div className="settings-content">
-            <SettingsRow                               /* Race Countdown Duration dropdown */
+            <SettingsRow
               icon={<Timer className="w-5 h-5" />}
               title="Race Countdown Duration"
               subtitle="Set the countdown time before race starts"
@@ -227,7 +205,7 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Maximum Players dropdown */
+            <SettingsRow
               icon={<Users className="w-5 h-5" />}
               title="Maximum Players"
               subtitle="Set the maximum number of players per race"
@@ -240,7 +218,7 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Default Country dropdown */
+            <SettingsRow
               icon={<Globe className="w-5 h-5" />}
               title="Default Country"
               subtitle="Select your default country"
@@ -256,12 +234,10 @@ export default function SettingsPage() {
           </div>
         );
 
-      /* ----- VOTING TAB ----- */
-      /* Summary: Confetti effects toggle and show vote count toggle. */
       case 'voting':
         return (
           <div className="settings-content">
-            <SettingsRow                               /* Enable Confetti Effects toggle */
+            <SettingsRow
               icon={<PartyPopper className="w-5 h-5" />}
               title="Enable Confetti Effects"
               subtitle="Show confetti at the end of races"
@@ -272,23 +248,21 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Show Vote Count toggle (stub — no store binding yet) */
+            <SettingsRow
               icon={<MousePointer className="w-5 h-5" />}
               title="Show Vote Count"
               subtitle="Display real-time vote counts during race"
               control={
-                <ToggleSwitch checked={true} onChange={() => {}} /> /* Hardcoded on, no-op onChange */
+                <ToggleSwitch checked={true} onChange={() => {}} />
               }
             />
           </div>
         );
 
-      /* ----- COUNTRIES TAB ----- */
-      /* Summary: Default country dropdown, show flags, show country codes toggles. */
       case 'countries':
         return (
           <div className="settings-content">
-            <SettingsRow                               /* Default Country dropdown */
+            <SettingsRow
               icon={<Globe className="w-5 h-5" />}
               title="Default Country"
               subtitle="Select your default country"
@@ -301,7 +275,7 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Show Country Flags toggle */
+            <SettingsRow
               icon={<Flag className="w-5 h-5" />}
               title="Show Country Flags"
               subtitle="Display flags next to player names"
@@ -312,24 +286,22 @@ export default function SettingsPage() {
                 />
               }
             />
-            <SettingsRow                               /* Show Country Codes toggle (stub — no store binding yet) */
+            <SettingsRow
               icon={<Eye className="w-5 h-5" />}
               title="Show Country Codes"
               subtitle="Display country codes on flags"
               control={
-                <ToggleSwitch checked={true} onChange={() => {}} /> /* Hardcoded on, no-op onChange */
+                <ToggleSwitch checked={true} onChange={() => {}} />
               }
             />
           </div>
         );
 
-      /* ----- ADVANCED TAB ----- */
-      /* Summary: Danger zone with leaderboard reset button. */
       case 'advanced':
         return (
           <div className="settings-content">
-            <div className="settings-danger-zone">     /* Wrapper for dangerous/destructive actions */
-              <SettingsRow                               /* Reset Daily Leaderboard button */
+            <div className="settings-danger-zone">
+              <SettingsRow
                 icon={<Trophy className="w-5 h-5" />}
                 title="Reset Daily Leaderboard"
                 subtitle="This will clear today's leaderboard for all players"
@@ -339,7 +311,7 @@ export default function SettingsPage() {
                     size="sm"
                     icon={<RotateCcw className="w-4 h-4" />}
                     onClick={() => {
-                      if (confirm('Are you sure you want to reset the leaderboard?')) { /* Confirm dialog before destructive action */
+                      if (confirm('Are you sure you want to reset the leaderboard?')) {
                         // Reset logic — placeholder for future backend integration
                       }
                     }}
@@ -352,43 +324,38 @@ export default function SettingsPage() {
           </div>
         );
 
-      /* ----- DEFAULT ----- */
-      /* Summary: Fallback for unknown tab IDs — renders nothing. */
       default:
         return null;
     }
   };
 
-  /* ===== RENDER: SETTINGS PAGE LAYOUT ===== */
-  /* Summary: Full page structure — background, header, title, tabbed sidebar/panel, and bottom action buttons. */
   return (
-    <GameBackground>                                        /* Full-page gradient background wrapper */
+    <GameBackground>
 
-      <GameHeader showSettings={false} />                   /* Shared header (settings icon hidden since we are already on settings) */
+      <GameHeader showSettings={false} />
 
       {/* ----- PAGE CONTENT ----- */}
-      <div className="settings-page">                       /* Root container for the settings layout */
+      <div className="settings-page">
 
         {/* Title */}
         <div className="settings-title">
-          <span className="settings-title__text">SETTINGS</span> /* Page heading */
+          <span className="settings-title__text">SETTINGS</span>
         </div>
 
         {/* ----- SETTINGS LAYOUT (SIDEBAR + PANEL) ----- */}
-        {/* Summary: Horizontal split — left sidebar with tabs, right panel with content. */}
         <div className="settings-layout">
 
           {/* Sidebar tabs */}
           <div className="settings-sidebar">
             <div className="settings-tabs">
-              {TABS.map((tab) => (                          /* Render each tab as a button in the sidebar */
+              {TABS.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}      /* Switch the active tab on click */
-                  className={`settings-tab ${activeTab === tab.id ? 'settings-tab--active' : ''}`} /* Highlight the active tab */
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`settings-tab ${activeTab === tab.id ? 'settings-tab--active' : ''}`}
                 >
-                  <span className="settings-tab__icon">{tab.icon}</span>   /* Tab icon */
-                  <span className="settings-tab__label">{tab.label}</span> /* Tab label text */
+                  <span className="settings-tab__icon">{tab.icon}</span>
+                  <span className="settings-tab__label">{tab.label}</span>
                 </button>
               ))}
             </div>
@@ -396,18 +363,17 @@ export default function SettingsPage() {
 
           {/* Content panel */}
           <div className="settings-panel">
-            <h2 className="settings-panel__title">{TABS.find(t => t.id === activeTab)?.label}</h2> /* Panel heading — name of active tab */
+            <h2 className="settings-panel__title">{TABS.find(t => t.id === activeTab)?.label}</h2>
             <div className="settings-panel__content">
-              {renderTabContent()}                           /* Render the settings rows for the active tab */
+              {renderTabContent()}
             </div>
           </div>
 
         </div>
 
         {/* ----- BOTTOM ACTIONS ----- */}
-        {/* Summary: Row of Save, Reset, and Cancel buttons. */}
         <div className="settings-actions">
-          <NeonButton                                       /* SAVE CHANGES — navigates back to lobby */
+          <NeonButton
             variant="primary"
             size="lg"
             icon={<Save className="w-5 h-5" />}
@@ -415,7 +381,7 @@ export default function SettingsPage() {
           >
             SAVE CHANGES
           </NeonButton>
-          <NeonButton                                       /* RESET TO DEFAULTS — restores store's default settings */
+          <NeonButton
             variant="danger"
             size="lg"
             icon={<RotateCcw className="w-5 h-5" />}
@@ -423,7 +389,7 @@ export default function SettingsPage() {
           >
             RESET TO DEFAULTS
           </NeonButton>
-          <NeonButton                                       /* CANCEL — navigates back to lobby without saving */
+          <NeonButton
             variant="secondary"
             size="lg"
             icon={<X className="w-5 h-5" />}
@@ -439,26 +405,23 @@ export default function SettingsPage() {
 }
 
 /* ===== SETTINGS ROW HELPER COMPONENT ===== */
-/* Summary: A reusable single-row layout with an icon, title, subtitle, and a control element (Slider, ToggleSwitch, Dropdown, etc.). */
 
-/* SettingsRowProps: Shape of props accepted by the SettingsRow component */
 interface SettingsRowProps {
-  icon: React.ReactNode;      /* Icon element displayed on the left of the row */
-  title: string;              /* Bold title text */
-  subtitle: string;           /* Dimmed subtitle text beneath the title */
-  control: React.ReactNode;   /* The interactive control (Slider, ToggleSwitch, Dropdown, Button) placed on the right */
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  control: React.ReactNode;
 }
 
-/* SettingsRow: Renders a single configuration row with icon, info, and control */
 function SettingsRow({ icon, title, subtitle, control }: SettingsRowProps) {
   return (
     <div className="settings-row">
-      <div className="settings-row__icon">{icon}</div>              /* Icon column */
+      <div className="settings-row__icon">{icon}</div>
       <div className="settings-row__info">
-        <span className="settings-row__title">{title}</span>        /* Setting name */
-        <span className="settings-row__subtitle">{subtitle}</span>  /* Setting description */
+        <span className="settings-row__title">{title}</span>
+        <span className="settings-row__subtitle">{subtitle}</span>
       </div>
-      <div className="settings-row__control">{control}</div>        /* The control element (slider, toggle, dropdown, etc.) */
+      <div className="settings-row__control">{control}</div>
     </div>
   );
 }

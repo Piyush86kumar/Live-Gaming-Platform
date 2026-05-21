@@ -1354,66 +1354,7 @@
     overflow: hidden;                     /* No page scroll */
   }
 
-  /* ---- Lobby Header: title + countdown + icon buttons ---- */
-  .lobby-header {
-    flex: 0 0 auto;                       /* Don't grow/shrink */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: clamp(8px,1.5vh,20px) clamp(16px,2vw,40px);
-    position: relative;                   /* For absolute icon btns */
-  }
-
-  .lobby-icon-btn {
-    position: absolute;                   /* Floated left/right */
-    width: clamp(40px,4vw,56px);
-    height: clamp(40px,4vw,56px);
-    background: rgba(10,22,40,0.9);
-    border: 2px solid rgba(255,255,255,0.25);
-    border-radius: clamp(6px,0.8vw,10px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: filter 0.15s, box-shadow 0.15s;
-  }
-
-  .lobby-icon-btn:hover {
-    filter: brightness(1.15);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.6);
-  }
-
-  .lobby-icon-btn--left {
-    left: clamp(16px,2vw,40px);
-    top: 50%; transform: translateY(-50%); /* Vertically center */
-  }
-
-  .lobby-icon-btn--right {
-    right: clamp(16px,2vw,40px);
-    top: 50%; transform: translateY(-50%);
-  }
-
-  .lobby-icon-btn__icon {
-    width: clamp(18px,1.8vw,26px);
-    height: clamp(18px,1.8vw,26px);
-    color: #00d4ff;                       /* Cyan icon */
-  }
-
-  .lobby-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700; font-style: italic;
-    font-size: clamp(2rem,4.5vw,4rem);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: white;
-    margin: 0;
-  }
-
-  .lobby-title__of {
-    color: #00d4ff;                       /* Cyan "OF" for emphasis */
-  }
-
+  /* ---- Lobby Countdown ---- */
   .lobby-countdown {
     display: flex;                       /* Inline pill layout */
     align-items: center;
@@ -1424,15 +1365,6 @@
     padding: clamp(4px,0.6vh,8px) clamp(12px,1.5vw,24px);
     width: fit-content;                  /* Shrink-wrap to content */
     margin: clamp(4px,0.8vh,10px) auto 0; /* Centered horizontally */
-  }
-
-  .lobby-countdown__label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 600;
-    font-size: clamp(0.7rem,1vw,0.9rem);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: white;
   }
 
   /* ---- Team Grid: 2 rows x 4 columns ---- */
