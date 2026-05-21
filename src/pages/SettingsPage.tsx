@@ -332,7 +332,7 @@ export default function SettingsPage() {
   return (
     <GameBackground>
 
-      <GameHeader showSettings={false} />
+      <GameHeader />
 
       {/* ----- PAGE CONTENT ----- */}
       <div className="settings-page">

@@ -10,11 +10,12 @@ import { cn } from '@/lib/utils';               /* Tailwind class merger */
 interface GameHeaderProps {
   showHome?: boolean;      /* Whether to render the Home button */
   showSettings?: boolean;  /* Whether to render the Settings button */
+  showTitle?: boolean;     /* Whether to render the center title */
   className?: string;      /* Additional CSS classes */
 }
 
 /* ===== COMPONENT ===== */
-export function GameHeader({ showHome = true, showSettings = true, className }: GameHeaderProps) {
+export function GameHeader({ showHome = true, showSettings = true, showTitle = true, className }: GameHeaderProps) {
   const navigate = useNavigate();  /* Get navigate function for route changes */
 
   return (
@@ -30,11 +31,13 @@ export function GameHeader({ showHome = true, showSettings = true, className }: 
       )}
 
       {/* ===== CENTER: GAME TITLE ===== */}
-      <GlowText variant="white" size="3xl" className="uppercase tracking-[0.2em] italic">
-        <span className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl">
-          RACE <span className="text-[#00d4ff]">OF</span> NATIONS
-        </span>
-      </GlowText>
+      {showTitle && (
+        <GlowText variant="white" size="3xl" className="uppercase tracking-[0.2em] italic">
+          <span className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl">
+            RACE <span className="text-[#00d4ff]">OF</span> NATIONS
+          </span>
+        </GlowText>
+      )}
 
       {/* ===== RIGHT CORNER: SETTINGS BUTTON ===== */}
       {showSettings && (

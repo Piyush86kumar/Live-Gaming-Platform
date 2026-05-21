@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 /* Summary: countryCode = lowercase 2-letter ISO code; size = one of six preset dimensions; alt = accessible label override. */
 interface CountryFlagProps {
   countryCode: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'banner' | 'full';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'banner' | 'full' | 'podium' | 'xs';
   className?: string;
   alt?: string;
 }
@@ -21,6 +21,8 @@ const FLAG_DIMENSIONS = {
   xl: { width: 72, height: 48 },
   full: { width: 240, height: 160 },
   banner: { width: 24, height: 16 },
+  podium: { width: 80, height: 55 },
+  xs: { width: 24, height: 16 },
 };
 
 /* ===== COMPONENT ===== */

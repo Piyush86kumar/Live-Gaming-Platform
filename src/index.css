@@ -704,252 +704,463 @@
   }
 
   /* ==============================================================
-     LEADERBOARD PAGE — Confetti Celebration Animation
+     LEADERBOARD PAGE — Full Viewport Layout
      --------------------------------------------------------------
-     Summary: Fixed overlay spawning falling colored rectangles.
-     Each piece animates from top to bottom with rotation via CSS.
-     Dynamic pieces created in JSX with randomized positions.
+     Summary: Custom page structure with stadium lights, checkered
+     floor, custom header, winner card, podium, timer/restart, and
+     sidebar leaderboard panel.
      ============================================================== */
+  .leaderboard-page-root {
+    position: relative;
+    height: 100vh; width: 100vw;
+    overflow: hidden;
+    background: #050b14;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Stadium lights (top corners) */
+  .lb-stadium-light {
+    position: fixed;
+    width: 60vw; height: 50vh;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(60px);
+    opacity: 0.15;
+  }
+
+  .lb-stadium-light--tl {
+    top: -10vh; left: -10vw;
+    background: radial-gradient(circle, rgba(200,230,255,0.3) 0%, rgba(0,150,255,0.1) 40%, transparent 70%);
+  }
+
+  .lb-stadium-light--tr {
+    top: -10vh; right: -10vw;
+    background: radial-gradient(circle, rgba(200,230,255,0.3) 0%, rgba(0,150,255,0.1) 40%, transparent 70%);
+  }
+
+  /* Checkered floor at bottom */
+  .lb-checkered-floor {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 120px;
+    pointer-events: none;
+    z-index: 0;
+    background-image: repeating-conic-gradient(#ffffff 0% 25%, #000000 0% 50%);
+    background-size: 40px 40px;
+    mask-image: linear-gradient(to top, black 20%, transparent);
+    -webkit-mask-image: linear-gradient(to top, black 20%, transparent);
+    opacity: 0.25;
+  }
+
+  /* Main wrapper */
+  .lb-main {
+    position: relative;
+    z-index: 1;
+    margin-top: 11px;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    padding: 0 24px 24px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Left column */
+  .lb-left-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+    padding-top: 11px;
+    min-height: 0;
+  }
+
+  /* Winner section */
+  .lb-winner-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .lb-winner-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(1.6rem,3vw,2.4rem);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #ffffff;
+    text-shadow: 0 0 16px rgba(59,130,246,0.8), 0 0 4px rgba(255,255,255,0.9);
+    margin: 0 0 12px 0;
+  }
+
+  .lb-winner-card-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lb-winner-card {
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 3/2;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid rgba(0,212,255,0.6);
+    box-shadow: 0 0 0 1px rgba(0,212,255,0.2), 0 0 30px rgba(0,212,255,0.35), inset 0 0 20px rgba(0,212,255,0.08);
+    position: relative;
+    animation: lb-card-glow 3s infinite alternate;
+    z-index: 1;
+  }
+
+  .lb-winner-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 45%, transparent 50%);
+    animation: lb-sheen 4s infinite;
+    pointer-events: none;
+  }
+
+  @keyframes lb-card-glow {
+    from { box-shadow: 0 0 0 1px rgba(0,212,255,0.2), 0 0 20px rgba(0,212,255,0.35), inset 0 0 20px rgba(0,212,255,0.08); }
+    to   { box-shadow: 0 0 0 1px rgba(0,212,255,0.2), 0 0 40px rgba(0,212,255,0.5),  inset 0 0 20px rgba(0,212,255,0.08); }
+  }
+
+  @keyframes lb-sheen {
+    0%   { transform: translateX(-100%); }
+    20%  { transform: translateX(100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .lb-winner-card-inner {
+    width: 100%;
+    height: 100%;
+  }
+
+  .lb-winner-flag {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+
+  .lb-winner-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(2.8rem,5.5vw,4.2rem);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #e2e8f0;
+    text-shadow:
+      0 2px 0 #2563eb,
+      0 4px 0 #1d4ed8,
+      0 6px 0 #1e40af,
+      0 0 24px rgba(59,130,246,0.4);
+    margin: 12px 0 0 0;
+    text-align: center;
+    line-height: 1.1;
+    animation: lb-winner-reveal 0.7s ease-out 0.2s both;
+  }
+
+  @keyframes lb-winner-reveal {
+    0%   { opacity: 0; transform: scale(0.85); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Podium */
+  .lb-podium {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .lb-podium-card {
+    width: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 10px;
+    border-radius: 12px;
+    background: #0d1f3c;
+    border: 2px solid rgba(0,212,255,0.35);
+    box-shadow: 0 0 15px rgba(0,212,255,0.15);
+  }
+
+  .lb-podium-rank {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.9rem,1.2vw,1.1rem);
+    color: #00d4ff;
+  }
+
+  .lb-podium-flag {
+    width: 80px;
+    height: 55px;
+    border-radius: 4px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .lb-podium-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.7rem,0.9vw,0.85rem);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  /* Timer + Restart */
+  .lb-timer-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .lb-timer-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: 9999px;
+    background: rgba(13,25,48,0.95);
+    border: 1px solid rgba(0,212,255,0.3);
+  }
+
+  .lb-restart-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-width: 220px;
+    padding: 14px 40px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+    border: 2px solid rgba(74,222,128,0.5);
+    box-shadow: 0 0 0 1px rgba(34,197,94,0.2), 0 0 24px rgba(34,197,94,0.35);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #ffffff;
+    cursor: pointer;
+    transition: filter 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .lb-restart-btn:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 0 0 1px rgba(34,197,94,0.2), 0 0 30px rgba(34,197,94,0.5);
+    transform: scale(1.02);
+  }
+
+  .lb-restart-flag {
+    width: 24px;
+    height: 16px;
+    border-radius: 3px;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+
+  /* Sidebar */
+  .lb-sidebar {
+    width: 360px;
+    flex-shrink: 0;
+    margin-right: 28px;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+
+  .lb-sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .lb-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .lb-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+  }
+
+  .lb-sidebar-panel {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(10,22,40,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-top: 2px solid rgba(255,215,0,0.35);
+    box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .lb-sidebar-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .lb-sidebar-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.85rem,1.1vw,1rem);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #ffffff;
+  }
+
+  .lb-sidebar-slash {
+    color: #00d4ff;
+    font-weight: 700;
+    margin-left: 4px;
+  }
+
+  .lb-sidebar-col-headers {
+    display: grid;
+    grid-template-columns: 44px 1fr 50px;
+    gap: 12px;
+    padding: 12px 12px;
+    margin-bottom: 4px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #64748b;
+  }
+
+  .lb-sidebar-col-headers span:nth-child(1) { text-align: center; }
+  .lb-sidebar-col-headers span:nth-child(2) { text-align: left; }
+  .lb-sidebar-col-headers span:nth-child(3) { text-align: right; }
+
+  .lb-sidebar-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 4px;
+  }
+
+  .lb-sidebar-list::-webkit-scrollbar { width: 6px; }
+  .lb-sidebar-list::-webkit-scrollbar-track { background: transparent; }
+  .lb-sidebar-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+  .lb-row {
+    display: grid;
+    grid-template-columns: 44px 1fr 50px;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 12px;
+    border-radius: 10px;
+    transition: background-color 0.15s ease;
+  }
+
+  .lb-row:hover {
+    background: rgba(0,212,255,0.06);
+  }
+
+  .lb-row--top {
+    background: rgba(255,215,0,0.04);
+  }
+
+  .lb-row-rank {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .lb-medal {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lb-rank-plain {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #64748b;
+    text-align: center;
+  }
+
+  .lb-row-country {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .lb-row-flag {
+    width: 32px;
+    height: 22px;
+    border-radius: 3px;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+  }
+
+  .lb-row-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lb-row-wins {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #94a3b8;
+    text-align: right;
+  }
+
+  /* Confetti */
   .confetti-container {
-    position: fixed;                     /* Full-screen overlay */
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;                /* Click-through */
-    z-index: 100;                        /* On top of everything */
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
     overflow: hidden;
   }
 
   .confetti-piece {
     position: absolute;
-    top: -20px;                          /* Start above viewport */
-    width: 10px; height: 10px;           /* Small square */
-    border-radius: 2px;                  /* Slightly rounded */
-    animation: confetti-fall 3s ease-out forwards; /* Drop + fade */
+    top: -20px;
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+    animation: lb-confetti-fall 3.5s ease-out forwards;
   }
 
-  @keyframes confetti-fall {
+  @keyframes lb-confetti-fall {
     0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } /* 2 full spins */
-  }
-
-  /* ==============================================================
-     LEADERBOARD PAGE — Winner Champion Display
-     --------------------------------------------------------------
-     Summary: Large centered flag between gold laurel icons with
-     glowing gold country name. Scales in via winner-reveal keyframe.
-     ============================================================== */
-  .winner-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 24px 16px 16px;             /* Top spacing for winner */
-  }
-
-  .winner-title {
-    margin-bottom: 24px;
-    text-align: center;
-  }
-
-  .winner-display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;                            /* Space flag ↔ laurels */
-    margin-bottom: 16px;
-  }
-
-  .winner-flag {
-    max-width: 300px;                     /* Large centered flag */
-    width: 100%;
-  }
-
-  .laurel {
-    width: 60px; height: 120px;           /* Tall laurel icon */
-    flex-shrink: 0;                       /* Never squish */
-    filter: drop-shadow(0 0 8px rgba(255,215,0,0.4)); /* Gold glow */
-  }
-
-  .laurel--left {
-    transform: scaleX(1);                 /* Face inward (default) */
-  }
-
-  .laurel--right {
-    transform: scaleX(-1);                /* Mirrored for right side */
-  }
-
-  .winner-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700; font-style: italic;
-    font-size: clamp(2rem,4vw,3.5rem);    /* Big responsive text */
-    text-transform: uppercase;
-    color: var(--color-text-gold);        /* Gold color */
-    text-shadow: 0 0 20px rgba(255,215,0,0.3); /* Gold halo */
-    animation: winner-reveal 0.6s ease-out; /* Pop-in animation */
-  }
-
-  @keyframes winner-reveal {
-    0%   { opacity: 0; transform: scale(0.8); }  /* Start small + hidden */
-    100% { opacity: 1; transform: scale(1); }     /* Full size + visible */
-  }
-
-  /* ==============================================================
-     LEADERBOARD PAGE — Podium Cards (2nd-5th Place)
-     --------------------------------------------------------------
-     Summary: 4-column grid below winner showing rank, flag, and
-     name for 2nd through 5th place finishers.
-     ============================================================== */
-  .podium {
-    display: grid;                       /* 4 equal columns */
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    width: 100%;
-    max-width: 800px;                    /* Center with max width */
-    margin-top: 24px;
-    padding: 0 16px;
-  }
-
-  .podium-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 16px 12px;
-    background: var(--color-bg-card);
-    border: 2px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    text-align: center;
-  }
-
-  .podium-card__rank {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: clamp(0.875rem,1vw,1rem);
-    text-transform: uppercase;
-    color: var(--color-text-accent);     /* Cyan rank number */
-  }
-
-  .podium-card__name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 600;
-    font-size: clamp(0.65rem,1vw,0.875rem);
-    text-transform: uppercase;
-    color: var(--color-text-secondary);
-  }
-
-  /* ==============================================================
-     LEADERBOARD PAGE — All-Time Wins Sidebar
-     --------------------------------------------------------------
-     Summary: Right panel showing global wins leaderboard. Each row:
-     rank (medal circle for top 3), flag, name, wins count (gold).
-     Medal borders set by inline style for gold/silver/bronze.
-     ============================================================== */
-  .leaderboard-sidebar {
-    width: 320px;                        /* Fixed sidebar width */
-    flex-shrink: 0;                      /* Don't shrink on resize */
-  }
-
-  .leaderboard-panel {
-    background: var(--color-bg-secondary);
-    border: 1px solid rgba(255,215,0,0.3); /* Gold border */
-    border-radius: 12px;
-    padding: 16px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .leaderboard-panel__header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .leaderboard-panel__title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: clamp(0.875rem,1.2vw,1rem);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-neon-gold);       /* Gold heading */
-  }
-
-  .leaderboard-panel__title span {
-    color: var(--color-text-primary);    /* White "DAILY" text */
-  }
-
-  .leaderboard-row {
-    display: grid;                       /* Rank | country | wins */
-    grid-template-columns: 40px 1fr 50px;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
-  }
-
-  .leaderboard-row:nth-child(-n+3) {
-    background: rgba(255,215,0,0.05);   /* Gold tint for top 3 */
-  }
-
-  .leaderboard-row:hover {
-    background: rgba(0,212,255,0.08);   /* Cyan hover tint */
-  }
-
-  .leaderboard-row__rank {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .medal-circle {
-    width: 28px; height: 28px;           /* Circular medal badge */
-    border-radius: 50%;
-    border: 2px solid;                   /* Color set by inline style */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
-    background: rgba(0,0,0,0.3);         /* Transparent fill */
-  }
-
-  .rank-number {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--color-text-secondary);
-    width: 28px; height: 28px;           /* Match medal size */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .leaderboard-row__country {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .leaderboard-row__name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 600;
-    font-size: clamp(0.75rem,1vw,0.875rem);
-    color: var(--color-text-primary);
-    text-transform: uppercase;
-  }
-
-  .leaderboard-row__wins {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--color-text-secondary);
-    text-align: right;
-  }
-
-  .leaderboard-row__wins--gold {
-    color: var(--color-neon-gold);       /* Gold wins for top 3 */
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
   }
 
   /* ==============================================================
@@ -965,6 +1176,7 @@
     flex-direction: column;
     padding: 0 16px 16px;
     min-height: 0;                       /* Allow flex shrink */
+    overflow: hidden;                    /* No page scroll — all scroll stays inside panel */
   }
 
   .settings-title {
@@ -1139,9 +1351,10 @@
   .settings-actions {
     display: flex;                       /* Save / Cancel buttons */
     justify-content: center;
+    align-items: center;
     gap: 16px;
-    margin-top: 24px;
-    padding-top: 16px;
+    padding: 20px 0 0;
+    flex-shrink: 0;                      /* Never push content below viewport */
   }
 
   /* ==============================================================
@@ -1364,7 +1577,7 @@
     border-radius: 8px;
     padding: clamp(4px,0.6vh,8px) clamp(12px,1.5vw,24px);
     width: fit-content;                  /* Shrink-wrap to content */
-    margin: clamp(4px,0.8vh,10px) auto 0; /* Centered horizontally */
+    margin: clamp(0px,0.8vh,5px) auto 0; /* Centered horizontally */
   }
 
   /* ---- Team Grid: 2 rows x 4 columns ---- */
@@ -1373,7 +1586,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: clamp(4px,1vh,18px) clamp(16px,2.5vw,48px);
+    padding: clamp(0px,1vh,13px) clamp(16px,2.5vw,48px);
     min-height: 0;
   }
 
@@ -1460,7 +1673,8 @@
     display: flex;
     gap: clamp(8px,1.2vw,20px);
     justify-content: center;
-    padding: clamp(4px,0.6vh,12px) 0 clamp(8px,1.2vh,18px) 0;
+    padding: clamp(0px,0.6vh,7px) 0 clamp(8px,1.2vh,18px) 0;
+    margin-top: -10px;
     flex-shrink: 0;
   }
 
@@ -1504,7 +1718,7 @@
   /* ---- Infinite Scrolling Flag Banner (bottom section) ---- */
   .banner-section {
     flex: 0 0 auto;
-    height: clamp(110px,18vh,170px);
+    height: clamp(115px,19vh,175px);
     display: flex;
     flex-direction: column;
     background: rgba(6,13,30,0.97);
