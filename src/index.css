@@ -1,442 +1,544 @@
+/* ==============================================================
+   GLOBAL STYLE ENTRY POINT — Race of Nations
+   --------------------------------------------------------------
+   Summary: Main CSS file imported in src/main.tsx. Uses Tailwind
+   v4 @theme + hand-written utility classes. No CSS modules.
+   Design: dark navy/cyan neon racing aesthetic, responsive via
+   clamp(), all text uppercase, backgrounds = pure CSS gradients.
+   ============================================================== */
+
+/* Google Fonts: Barlow Condensed (headings) at 400/600/700/700i */
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,700&display=swap');
-@import "tailwindcss";
+@import "tailwindcss";                   /* Tailwind v4 base + utilities */
 
+/* ==============================================================
+   :root — CSS Custom Property Design Tokens
+   --------------------------------------------------------------
+   Summary: Pre-Tailwind design tokens kept for backward compat.
+   Naming: --color-{category}-{descriptor}
+   ============================================================== */
 :root {
-  /* Core backgrounds */
-  --color-bg-primary: #050a1a;
-  --color-bg-secondary: #0a1628;
-  --color-bg-card: #0d1f3c;
-  --color-bg-card-hover: #112447;
+  /* Page/section backgrounds — darkest to lightest */
+  --color-bg-primary: #050a1a;          /* Deepest page background */
+  --color-bg-secondary: #0a1628;        /* Panel/card area background */
+  --color-bg-card: #0d1f3c;             /* Card surface color */
+  --color-bg-card-hover: #112447;       /* Card hover state */
 
-  /* Neon accents */
-  --color-neon-cyan: #00d4ff;
-  --color-neon-cyan-glow: rgba(0, 212, 255, 0.3);
-  --color-neon-magenta: #ff00aa;
-  --color-neon-gold: #ffd700;
+  /* Brand neon palette */
+  --color-neon-cyan: #00d4ff;           /* Primary accent — cyan */
+  --color-neon-cyan-glow: rgba(0,212,255,0.3); /* Cyan halo */
+  --color-neon-magenta: #ff00aa;        /* Secondary accent — pink */
+  --color-neon-gold: #ffd700;           /* Winner/boost highlight */
 
-  /* UI states */
-  --color-selected-border: #00d4ff;
-  --color-waiting: #4a5568;
+  /* Interaction state colors */
+  --color-selected-border: #00d4ff;     /* Selected item border */
+  --color-waiting: #4a5568;             /* Dim placeholder state */
 
-  /* Buttons */
-  --color-btn-green: #22c55e;
-  --color-btn-green-hover: #16a34a;
-  --color-btn-red: #dc2626;
-  --color-btn-red-hover: #b91c1c;
-  --color-btn-blue: #1e40af;
-  --color-btn-blue-hover: #1d4ed8;
+  /* Button colors (override when Tailwind classes aren't used) */
+  --color-btn-green: #22c55e;           /* Start/confirm button */
+  --color-btn-green-hover: #16a34a;     /* Green hover state */
+  --color-btn-red: #dc2626;             /* Reset/danger button */
+  --color-btn-red-hover: #b91c1c;       /* Red hover state */
+  --color-btn-blue: #1e40af;            /* Action button */
+  --color-btn-blue-hover: #1d4ed8;      /* Blue hover state */
 
-  /* Text */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #94a3b8;
-  --color-text-accent: #00d4ff;
-  --color-text-gold: #ffd700;
+  /* Text color scale */
+  --color-text-primary: #ffffff;        /* Primary white text */
+  --color-text-secondary: #94a3b8;      /* Muted gray text */
+  --color-text-accent: #00d4ff;         /* Cyan accent text */
+  --color-text-gold: #ffd700;           /* Gold winner text */
 
-  /* Track */
-  --color-track-bg: #1a1a2e;
-  --color-track-line: rgba(255, 255, 255, 0.15);
-  --color-finish-checker: #ffffff;
+  /* Race track specific */
+  --color-track-bg: #1a1a2e;            /* Track surface color */
+  --color-track-line: rgba(255,255,255,0.15); /* Lane dividers */
+  --color-finish-checker: #ffffff;      /* Checkered pattern white */
 }
 
+/* ==============================================================
+   @theme — Tailwind v4 Custom Theme Variables
+   --------------------------------------------------------------
+   Summary: Defines app-specific colors, fonts, radii, and shadows
+   as Tailwind utilities (e.g. bg-navy-800, font-heading, shadow-neon).
+   Each --color/--font/--radius/--shadow becomes a utility class.
+   ============================================================== */
 @theme {
-  --color-navy-900: #0a0e1a;
-  --color-navy-800: #0f1729;
-  --color-navy-700: #162033;
-  --color-navy-600: #1e2d4a;
-  --color-navy-500: #2a3f5f;
-  --color-neon-blue: #00d4ff;
-  --color-neon-cyan: #00f0ff;
-  --color-electric-blue: #0080ff;
-  --color-gold: #ffd700;
-  --color-gold-light: #ffec8b;
-  --color-action-green: #00c853;
-  --color-action-green-hover: #00e676;
-  --color-danger-red: #ff1744;
-  --color-danger-red-hover: #ff4569;
-  --color-glass-bg: rgba(15, 23, 41, 0.85);
-  --color-glass-border: rgba(0, 212, 255, 0.3);
-  --color-glass-border-hover: rgba(0, 212, 255, 0.6);
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #8b9dc3;
-  --color-text-muted: #4a5568;
-  --font-heading: "Rajdhani", sans-serif;
-  --font-body: "Inter", sans-serif;
-  --radius-panel: 12px;
-  --radius-button: 8px;
-  --radius-small: 6px;
-  --shadow-neon: 0 0 20px rgba(0, 212, 255, 0.3), 0 0 40px rgba(0, 212, 255, 0.1);
-  --shadow-neon-strong: 0 0 30px rgba(0, 212, 255, 0.5), 0 0 60px rgba(0, 212, 255, 0.2);
-  --shadow-gold: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.15);
-  --shadow-green: 0 0 15px rgba(0, 200, 83, 0.4);
-  --shadow-red: 0 0 15px rgba(255, 23, 68, 0.4);
+  --color-navy-900: #0a0e1a;             /* Deepest background */
+  --color-navy-800: #0f1729;             /* Page background */
+  --color-navy-700: #162033;             /* Section background */
+  --color-navy-600: #1e2d4a;             /* Elevated surface */
+  --color-navy-500: #2a3f5f;             /* Border/hover accent */
+  --color-neon-blue: #00d4ff;            /* Primary neon accent */
+  --color-neon-cyan: #00f0ff;            /* Brighter cyan glow */
+  --color-electric-blue: #0080ff;        /* Deep blue accent */
+  --color-gold: #ffd700;                 /* Winner/boost gold */
+  --color-gold-light: #ffec8b;           /* Gold highlight tint */
+  --color-action-green: #00c853;         /* Start/confirm button */
+  --color-action-green-hover: #00e676;   /* Green hover state */
+  --color-danger-red: #ff1744;           /* Reset/danger button */
+  --color-danger-red-hover: #ff4569;     /* Red hover state */
+  --color-glass-bg: rgba(15,23,41,0.85); /* Glass panel fill */
+  --color-glass-border: rgba(0,212,255,0.3); /* Glass border */
+  --color-glass-border-hover: rgba(0,212,255,0.6); /* Hover border */
+  --color-text-primary: #ffffff;         /* White body text */
+  --color-text-secondary: #8b9dc3;       /* Muted text */
+  --color-text-muted: #4a5568;           /* Disabled/placeholder */
+  --font-heading: "Rajdhani", sans-serif;/* Display heading font */
+  --font-body: "Inter", sans-serif;      /* Body text font */
+  --radius-panel: 12px;                  /* Panel border-radius */
+  --radius-button: 8px;                  /* Button border-radius */
+  --radius-small: 6px;                   /* Small element radius */
+  --shadow-neon: 0 0 20px rgba(0,212,255,0.3), 0 0 40px rgba(0,212,255,0.1); /* Cyan glow */
+  --shadow-neon-strong: 0 0 30px rgba(0,212,255,0.5), 0 0 60px rgba(0,212,255,0.2); /* Strong glow */
+  --shadow-gold: 0 0 20px rgba(255,215,0,0.4), 0 0 40px rgba(255,215,0,0.15); /* Gold glow */
+  --shadow-green: 0 0 15px rgba(0,200,83,0.4);    /* Green action glow */
+  --shadow-red: 0 0 15px rgba(255,23,68,0.4);      /* Red danger glow */
 }
 
+/* ==============================================================
+   @layer base — HTML & Body Reset
+   --------------------------------------------------------------
+   Summary: Full-viewport, no-scroll app shell with dark navy bg
+   and Inter font. Universal box-sizing: border-box.
+   ============================================================== */
 @layer base {
   html, body, #root {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    background-color: var(--color-navy-900);
-    font-family: var(--font-body);
-    color: var(--color-text-primary);
+    height: 100%;                        /* Full viewport height */
+    width: 100%;                         /* Full viewport width */
+    overflow: hidden;                    /* No page scroll — single screen app */
+    background-color: var(--color-navy-900); /* Dark navy background */
+    font-family: var(--font-body);       /* Inter body font */
+    color: var(--color-text-primary);    /* White default text */
   }
 
   * {
-    box-sizing: border-box;
+    box-sizing: border-box;              /* Consistent box model everywhere */
   }
 }
 
+/* ==============================================================
+   @layer utilities — App-Specific Component Styles
+   --------------------------------------------------------------
+   Summary: All hand-written utility and component CSS classes using
+   tokens from :root and @theme. Organized by feature area.
+   ============================================================== */
 @layer utilities {
+
+  /* ---- Font utilities ---- */
   .font-heading {
-    font-family: var(--font-heading);
+    font-family: var(--font-heading);    /* Rajdhani display font */
   }
 
   .font-body {
-    font-family: var(--font-body);
+    font-family: var(--font-body);       /* Inter body font */
   }
 
+  /* ---- Text glow (neon cyan / gold) ---- */
   .text-glow {
-    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5), 0 0 20px rgba(0, 212, 255, 0.3);
+    text-shadow: 0 0 10px rgba(0,212,255,0.5), 0 0 20px rgba(0,212,255,0.3); /* Cyan halo */
   }
 
   .text-glow-gold {
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
+    text-shadow: 0 0 10px rgba(255,215,0,0.5), 0 0 20px rgba(255,215,0,0.3); /* Gold halo */
   }
 
+  /* ---- Neon border (static + hover) ---- */
   .neon-border {
-    border: 1px solid var(--color-glass-border);
-    box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.05);
+    border: 1px solid var(--color-glass-border);   /* Subtle cyan edge */
+    box-shadow: inset 0 0 20px rgba(0,212,255,0.05); /* Inner glow */
   }
 
   .neon-border-hover:hover {
-    border-color: var(--color-glass-border-hover);
-    box-shadow: inset 0 0 30px rgba(0, 212, 255, 0.1), 0 0 20px rgba(0, 212, 255, 0.2);
+    border-color: var(--color-glass-border-hover); /* Brighter cyan on hover */
+    box-shadow: inset 0 0 30px rgba(0,212,255,0.1), 0 0 20px rgba(0,212,255,0.2); /* Stronger glow */
   }
 
+  /* ---- Glass-morphism panel ---- */
   .glass-panel {
-    background: var(--color-glass-bg);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--color-glass-border);
-    border-radius: var(--radius-panel);
+    background: var(--color-glass-bg);   /* Semi-transparent dark fill */
+    backdrop-filter: blur(12px);         /* Frosted glass blur */
+    border: 1px solid var(--color-glass-border); /* Cyan edge */
+    border-radius: var(--radius-panel);  /* Rounded corners */
   }
 
+  /* ---- Gradient text (white→cyan→blue) ---- */
   .gradient-text {
-    background: linear-gradient(135deg, #ffffff 0%, #00d4ff 50%, #0080ff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    background: linear-gradient(135deg, #ffffff 0%, #00d4ff 50%, #0080ff 100%); /* Cyan gradient */
+    -webkit-background-clip: text;       /* Clip bg to text (Safari) */
+    -webkit-text-fill-color: transparent;/* Transparent fill (Safari) */
+    background-clip: text;               /* Clip bg to text */
   }
 
   .gradient-text-gold {
-    background: linear-gradient(135deg, #ffd700 0%, #ffec8b 50%, #ffd700 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    background: linear-gradient(135deg, #ffd700 0%, #ffec8b 50%, #ffd700 100%); /* Gold gradient */
+    -webkit-background-clip: text;       /* Clip bg to text (Safari) */
+    -webkit-text-fill-color: transparent;/* Transparent fill (Safari) */
+    background-clip: text;               /* Clip bg to text */
   }
 
+  /* ---- Decorative background patterns ---- */
   .scanline {
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.03) 2px,
-      rgba(0, 0, 0, 0.03) 4px
+    background: repeating-linear-gradient( /* Horizontal scan lines */
+      0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
     );
-    pointer-events: none;
+    pointer-events: none;                /* Allow clicks through overlay */
   }
 
   .grid-bg {
-    background-image: 
-      linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
+    background-image:                    /* Subtle cyan grid overlay */
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;          /* 50px grid cell size */
   }
 
   .racing-stripe {
-    background: repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 10px,
-      rgba(255, 255, 255, 0.1) 10px,
-      rgba(255, 255, 255, 0.1) 20px
+    background: repeating-linear-gradient( /* Vertical white stripes */
+      90deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px
     );
   }
 
+  /* ---- Stadium background (GameBackground.tsx) ---- */
+  /* Central spotlight (white→cyan→transparent) + two side cyan washes over dark navy gradient */
   .bg-stadium {
     background:
-      radial-gradient(ellipse 40% 60% at 15% 0%, rgba(0, 150, 255, 0.18) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 60% at 85% 0%, rgba(0, 150, 255, 0.18) 0%, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0, 80, 180, 0.15) 0%, transparent 60%),
-      linear-gradient(180deg, #0a1628 0%, #050a1a 60%, #020710 100%);
-    min-height: 100vh;
-    width: 100%;
+      radial-gradient(ellipse 30% 50% at 50% 0%, rgba(200,230,255,0.25) 0%, rgba(0,180,255,0.12) 40%, transparent 70%),
+      radial-gradient(ellipse 35% 50% at 15% 0%, rgba(0,150,255,0.12) 0%, transparent 65%),
+      radial-gradient(ellipse 35% 50% at 85% 0%, rgba(0,150,255,0.12) 0%, transparent 65%),
+      linear-gradient(180deg, #0c1a30 0%, #070e1e 50%, #020710 100%);
+    min-height: 100vh;                   /* Full viewport height */
+    width: 100%;                         /* Full width */
   }
 
+  /* ---- Raw track background ---- */
   .bg-track {
-    background: #1a1a2e;
+    background: #1a1a2e;                 /* Dark track surface */
   }
 
-  .icon-button {
-    width: 48px;
-    height: 48px;
+  /* ---- Game Header: title centered, buttons anchored to screen corners ---- */
+  .game-header {
+    display: flex;                       /* Flex for centering title */
+    align-items: center;
+    justify-content: center;             /* Title centered */
+    padding: clamp(8px,1.5vh,20px) 0;   /* Vertical spacing only */
+    position: relative;                  /* Anchor for absolute-positioned buttons */
+    z-index: 10;
+    width: 100%;                         /* Full viewport width */
+  }
+
+  .game-header-btn {
+    position: fixed;                     /* Anchored to viewport corners */
+    width: clamp(44px,4vw,56px);        /* Responsive square size */
+    height: clamp(44px,4vw,56px);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
-    border: 2px solid rgba(0, 212, 255, 0.4);
-    background: rgba(15, 23, 41, 0.9);
-    box-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+    border-radius: clamp(6px,0.6vw,10px);
+    border: 2px solid rgba(0,212,255,0.4); /* Cyan border */
+    background: rgba(10,22,40,0.9);      /* Dark glass fill */
+    box-shadow: 0 0 12px rgba(0,212,255,0.3); /* Cyan glow */
     cursor: pointer;
     transition: all 0.2s ease;
+    z-index: 20;                         /* Above game-header title */
   }
 
-  .icon-button:hover {
-    border-color: rgba(0, 212, 255, 0.7);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+  .game-header-btn:hover {
+    border-color: rgba(0,212,255,0.7);  /* Brighter border */
+    box-shadow: 0 0 20px rgba(0,212,255,0.5); /* Stronger glow */
     filter: brightness(1.15);
   }
 
-  /* Team Grid - 2 rows × 4 columns */
+  .game-header-btn--left {
+    top: clamp(8px,1.5vh,20px);         /* Align top with header padding */
+    left: clamp(12px,2vw,32px);         /* Screen left edge */
+  }
+
+  .game-header-btn--right {
+    top: clamp(8px,1.5vh,20px);         /* Align top with header padding */
+    right: clamp(12px,2vw,32px);        /* Screen right edge */
+  }
+
+  .game-header-btn__icon {
+    width: clamp(18px,1.8vw,24px);
+    height: clamp(18px,1.8vw,24px);
+    color: #00d4ff;                      /* Cyan icon */
+  }
+
+  /* ---- Icon button (settings, back, etc.) ---- */
+  .icon-button {
+    width: 48px;                         /* Fixed square size */
+    height: 48px;
+    display: flex;                       /* Center icon inside */
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;                  /* Slightly rounded */
+    border: 2px solid rgba(0,212,255,0.4); /* Cyan border */
+    background: rgba(15,23,41,0.9);      /* Dark glass fill */
+    box-shadow: 0 0 12px rgba(0,212,255,0.3); /* Cyan glow */
+    cursor: pointer;                     /* Clickable */
+    transition: all 0.2s ease;           /* Smooth hover */
+  }
+
+  .icon-button:hover {
+    border-color: rgba(0,212,255,0.7);  /* Brighter border */
+    box-shadow: 0 0 20px rgba(0,212,255,0.5); /* Stronger glow */
+    filter: brightness(1.15);            /* Slight brighten */
+  }
+
+  /* ==============================================================
+     LOBBY PAGE — Team Selection Grid (Legacy Version)
+     --------------------------------------------------------------
+     Summary: Defines a grid layout with 8 team slots (2 rows × 4 cols).
+     Each slot shows flag, country code, and team name with hover effects.
+     ============================================================== */
+
+  /* Team Grid: 2 rows × 4 columns */
   .teams-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 16px;
-    height: 100%;
+    display: grid;                       /* CSS grid layout */
+    grid-template-columns: repeat(4, 1fr);/* 4 equal columns */
+    grid-template-rows: repeat(2, 1fr);  /* 2 equal rows */
+    gap: 16px;                           /* Space between slots */
+    height: 100%;                        /* Fill container height */
   }
 
   .team-slot {
-    background: var(--color-bg-card);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-    gap: 6px;
-    transition: all 0.3s ease;
-    min-height: 160px;
+    background: var(--color-bg-card);    /* Card background */
+    border: 2px solid rgba(255,255,255,0.1); /* Subtle border */
+    border-radius: 10px;                 /* Rounded corners */
+    display: flex;                       /* Flexbox layout */
+    flex-direction: column;              /* Stack items vertically */
+    align-items: center;                 /* Center horizontally */
+    justify-content: center;             /* Center vertically */
+    padding: 12px;                       /* Inner spacing */
+    gap: 6px;                            /* Space between children */
+    transition: all 0.3s ease;           /* Smooth hover animation */
+    min-height: 160px;                   /* Minimum slot height */
   }
 
   .team-slot--filled {
-    border: 2px solid var(--color-neon-cyan);
-    box-shadow: 0 0 16px rgba(0, 212, 255, 0.35);
+    border: 2px solid var(--color-neon-cyan); /* Cyan highlight border */
+    box-shadow: 0 0 16px rgba(0,212,255,0.35); /* Cyan glow */
   }
 
   .team-slot--filled:hover {
-    transform: scale(1.02);
+    transform: scale(1.02);              /* Slight zoom on hover */
   }
 
   .team-slot__flag {
-    width: 100%;
-    height: 65%;
-    display: flex;
+    width: 100%;                         /* Full width */
+    height: 100%;                        /* Full height */
+    display: flex;                       /* Center image */
     align-items: center;
     justify-content: center;
   }
 
   .team-slot__flag img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+    width: 100%;                         /* Fill container width */
+    height: 100%;                        /* Fill container height */
+    object-fit: contain;                 /* Maintains aspect ratio */
   }
 
   .team-slot__code {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: clamp(1rem, 1.5vw, 1.25rem);
-    color: var(--color-text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-family: 'Barlow Condensed', sans-serif; /* Bold condensed font */
+    font-weight: 700;                    /* Heavy weight */
+    font-size: clamp(1rem,1.5vw,1.25rem);/* Responsive text size */
+    color: var(--color-text-primary);    /* White text */
+    text-transform: uppercase;           /* All caps */
+    letter-spacing: 0.1em;               /* Extra spacing */
   }
 
   .team-slot__name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 400;
-    font-size: clamp(0.65rem, 1vw, 0.875rem);
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
+    font-family: 'Barlow Condensed', sans-serif; /* Same font */
+    font-weight: 400;                    /* Normal weight */
+    font-size: clamp(0.65rem,1vw,0.875rem); /* Smaller responsive size */
+    color: var(--color-text-secondary);  /* Muted gray text */
+    text-transform: uppercase;           /* All caps */
   }
 
   .team-slot__icon {
-    width: 40px;
+    width: 40px;                         /* Placeholder icon size */
     height: 40px;
-    color: var(--color-waiting);
+    color: var(--color-waiting);         /* Dim gray color */
   }
 
   .team-slot__label {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Barlow Condensed', sans-serif; /* Bold condensed */
     font-weight: 700;
-    font-size: clamp(1rem, 1.5vw, 1.25rem);
-    color: var(--color-waiting);
+    font-size: clamp(1rem,1.5vw,1.25rem);/* Responsive size */
+    color: var(--color-waiting);         /* Dim gray for "EMPTY" */
     text-transform: uppercase;
   }
 
   .team-slot__waiting {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Barlow Condensed', sans-serif; /* Normal weight */
     font-weight: 400;
-    font-size: clamp(0.65rem, 1vw, 0.875rem);
-    color: var(--color-text-secondary);
+    font-size: clamp(0.65rem,1vw,0.875rem); /* Small text */
+    color: var(--color-text-secondary);  /* Muted gray */
   }
 
-  /* Country Selector Panel */
+  /* ==============================================================
+     LOBBY PAGE — Country Selector Overlay (Legacy)
+     --------------------------------------------------------------
+     Summary: Clickable country picker panel with flag, name, and code.
+     Triggered when user clicks an empty team slot.
+     ============================================================== */
   .country-selector-panel {
-    background: rgba(10, 22, 40, 0.8);
-    border: 1px solid rgba(0, 212, 255, 0.15);
-    border-radius: 12px;
-    padding: 16px 24px;
+    background: rgba(10,22,40,0.8);      /* Semi-transparent dark bg */
+    border: 1px solid rgba(0,212,255,0.15); /* Subtle cyan edge */
+    border-radius: 12px;                  /* Rounded container */
+    padding: 16px 24px;                   /* Inner spacing */
   }
 
   .country-item {
-    display: flex;
+    display: flex;                        /* Stack flag + labels */
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 8px;
-    border: 2px solid transparent;
-    transition: all 0.2s ease;
+    gap: 4px;                             /* Tight spacing */
+    cursor: pointer;                      /* Clickable */
+    padding: 8px;                         /* Touch target */
+    border-radius: 8px;                   /* Rounded hover bg */
+    border: 2px solid transparent;        /* Reserve border space */
+    transition: all 0.2s ease;            /* Smooth hover */
   }
 
   .country-item:hover {
-    border-color: rgba(0, 212, 255, 0.4);
-    background: rgba(0, 212, 255, 0.08);
+    border-color: rgba(0,212,255,0.4);   /* Cyan border on hover */
+    background: rgba(0,212,255,0.08);    /* Subtle cyan bg tint */
   }
 
   .country-item img {
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;                   /* Rounded flag corners */
+    border: 1px solid rgba(255,255,255,0.15); /* White edge */
   }
 
   .country-item__name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 400;
-    font-size: 11px;
-    color: var(--color-text-primary);
+    font-family: 'Barlow Condensed', sans-serif; /* Racing font */
+    font-weight: 400;                     /* Normal weight */
+    font-size: 11px;                      /* Small label */
+    color: var(--color-text-primary);     /* White text */
     text-transform: uppercase;
   }
 
   .country-item__code {
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 10px;
-    color: var(--color-text-accent);
+    font-weight: 700;                     /* Bold country code */
+    font-size: 10px;                      /* Even smaller */
+    color: var(--color-text-accent);      /* Cyan text */
     text-transform: uppercase;
   }
 
-  /* Infinite Scrolling Banner */
+  /* ==============================================================
+     LOBBY PAGE — Infinite Flag Scrolling Banner
+     --------------------------------------------------------------
+     Summary: Horizontally scrolling marquee of clickable country flags.
+     Uses translateX(-50%) keyframe with duplicated item list for
+     seamless loop. Hovering a flag shows cyan border glow.
+     ============================================================== */
   .banner-container {
-    width: 100%;
-    overflow: hidden;
-    background: rgba(5, 10, 26, 0.95);
-    border-top: 1px solid rgba(0, 212, 255, 0.2);
-    padding: 10px 0;
-    height: 56px;
+    width: 10%;                         /* Full width */
+    overflow: hidden;                    /* Clip the scrolling track */
+    background: rgba(5,10,26,0.95);      /* Near-black bg */
+    border-top: 1px solid rgba(0,212,255,0.2); /* Top cyan line */
+    padding: 10px 0;                     /* Vertical padding */
+    height: 30px;                        /* Fixed banner height */
   }
 
   .banner-track {
-    display: flex;
-    gap: 40px;
-    animation: marquee 40s linear infinite;
-    width: max-content;
+    display: flex;                       /* Horizontal row */
+    gap: 20px;                           /* Space between items */
+    animation: marquee 40s linear infinite; /* Continuous scroll */
+    width: max-content;                  /* Expand to fit content */
   }
 
   .banner-item {
-    display: flex;
+    display: flex;                       /* Flag + text inline */
     align-items: center;
     gap: 8px;
-    padding: 4px 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
-    flex-shrink: 0;
+    padding: 4px 12px;                   /* Inner padding */
+    background: rgba(255,255,255,0.05);  /* Subtle white tint */
+    border-radius: 6px;                  /* Rounded pill */
+    flex-shrink: 0;                      /* Don't shrink items */
   }
 
   .banner-name {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 600;
-    font-size: clamp(0.65rem, 1vw, 0.875rem);
+    font-size: clamp(0.65rem,1vw,0.875rem);
     text-transform: uppercase;
-    color: var(--color-text-secondary);
+    color: var(--color-text-secondary);  /* Muted gray name */
   }
 
   .banner-code {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(0.65rem, 1vw, 0.875rem);
+    font-size: clamp(0.65rem,1vw,0.875rem);
     text-transform: uppercase;
-    color: var(--color-text-accent);
-    letter-spacing: 0.05em;
+    color: var(--color-text-accent);     /* Cyan code */
+    letter-spacing: 0.05em;              /* Loose spacing */
   }
 
   @keyframes marquee {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-50%);
-    }
+    0%   { transform: translateX(0); }   /* Start at beginning */
+    100% { transform: translateX(-50%); } /* Scroll halfway (items cloned) */
   }
 
-  /* Race Track */
+  /* ==============================================================
+     RACE PAGE — Original Static Race Track (Legacy)
+     --------------------------------------------------------------
+     Summary: Dark track container with dashed lane dividers,
+     checkered finish line on the right, and car sprites positioned
+     via percentage progress. Used by older RacePage layout.
+     ============================================================== */
   .race-track {
-    background: var(--color-track-bg);
-    border-radius: 12px;
-    border: 1px solid rgba(0, 212, 255, 0.2);
-    min-height: 300px;
-    height: calc(100vh - 320px);
-    max-height: 500px;
-    position: relative;
-    overflow: hidden;
+    background: var(--color-track-bg);   /* Dark track surface */
+    border-radius: 12px;                 /* Rounded container */
+    border: 1px solid rgba(0,212,255,0.2); /* Cyan border */
+    min-height: 300px;                   /* Minimum height */
+    height: calc(100vh - 320px);         /* Dynamic height */
+    max-height: 500px;                   /* Cap height */
+    position: relative;                  /* For absolute children */
+    overflow: hidden;                    /* Clip lane content */
   }
 
   .race-track__inner {
-    position: relative;
+    position: relative;                  /* Positioning context */
     width: 100%;
     height: 100%;
   }
 
   .lane-dividers {
-    position: absolute;
+    position: absolute;                  /* Overlay on track */
     inset: 0;
   }
 
   .lane-divider {
-    position: absolute;
+    position: absolute;                  /* Dashed line per lane */
     left: 0;
     right: 0;
-    border-bottom: 2px dashed var(--color-track-line);
+    border-bottom: 2px dashed var(--color-track-line); /* Dashed separator */
   }
 
   .finish-line {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 16px;
-    background: repeating-linear-gradient(
+    position: absolute;                  /* Right-edge flag */
+    right: 0; top: 0; bottom: 0;
+    width: 16px;                         /* Thin checkered strip */
+    background: repeating-linear-gradient( /* Checkered pattern */
       0deg,
-      var(--color-finish-checker) 0px,
-      var(--color-finish-checker) 8px,
-      var(--color-track-bg) 8px,
-      var(--color-track-bg) 16px
+      var(--color-finish-checker) 0px, var(--color-finish-checker) 8px,
+      var(--color-track-bg) 8px, var(--color-track-bg) 16px
     );
   }
 
   .race-lanes {
     position: relative;
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: column;              /* Stack lanes vertically */
   }
 
   .race-lane {
-    flex: 1;
+    flex: 1;                             /* Equal height per lane */
     display: flex;
     align-items: center;
-    padding: 0 24px 0 16px;
+    padding: 0 24px 0 16px;             /* Left/right padding */
     position: relative;
   }
 
@@ -444,56 +546,53 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    z-index: 2;
-    flex-shrink: 0;
+    z-index: 2;                          /* Above car sprite */
+    flex-shrink: 0;                      /* Don't compress */
   }
 
   .race-lane__code {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(0.75rem, 1.2vw, 1rem);
+    font-size: clamp(0.75rem,1.2vw,1rem);
     color: var(--color-text-primary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 
   .race-lane__car {
-    position: absolute;
-    transition: left 0.3s ease-out;
+    position: absolute;                  /* Progress-based position */
+    transition: left 0.3s ease-out;      /* Smooth movement */
     z-index: 1;
   }
 
   .car-trail {
     position: absolute;
-    left: -40px;
+    left: -40px;                         /* Behind the car */
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
-    height: 4px;
-    background: linear-gradient(to left, rgba(255, 255, 255, 0.3), transparent);
+    width: 40px; height: 4px;
+    background: linear-gradient(to left, rgba(255,255,255,0.3), transparent); /* Fade out */
     border-radius: 2px;
   }
 
   .car-sprite-container {
-    width: 80px;
-    height: 48px;
+    width: 80px; height: 48px;           /* Fixed car display area */
     position: relative;
   }
 
   .car-sprite {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+    width: 100%; height: 100%;
+    object-fit: contain;                 /* Maintain aspect ratio */
   }
 
   .race-lane__boost {
     position: absolute;
-    right: 24px;
+    right: 24px;                         /* Right side badge */
     display: flex;
     align-items: center;
     gap: 4px;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0,0,0,0.6);         /* Dark pill */
+    border: 1px solid rgba(255,255,255,0.2);
     border-radius: 6px;
     padding: 4px 10px;
   }
@@ -502,20 +601,25 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
     font-size: 14px;
-    color: var(--color-neon-gold);
+    color: var(--color-neon-gold);       /* Gold icon */
   }
 
   .boost-count {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
     font-size: 14px;
-    color: var(--color-text-primary);
+    color: var(--color-text-primary);    /* White count */
   }
 
-  /* Boost Panel */
+  /* ==============================================================
+     RACE PAGE — Boost Panel (Vote for a Team)
+     --------------------------------------------------------------
+     Summary: Bottom panel during race showing clickable vote cards
+     for each active team. Most-voted card gets gold highlight.
+     ============================================================== */
   .boost-panel {
-    background: var(--color-bg-secondary);
-    border: 1px solid rgba(0, 212, 255, 0.2);
+    background: var(--color-bg-secondary);/* Dark panel bg */
+    border: 1px solid rgba(0,212,255,0.2); /* Cyan edge */
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 16px;
@@ -524,7 +628,7 @@
   .boost-panel__title {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    font-size: clamp(1rem,1.5vw,1.25rem);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--color-text-primary);
@@ -533,7 +637,7 @@
   }
 
   .boost-panel__grid {
-    display: grid;
+    display: grid;                       /* Auto-fit card grid */
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 12px;
     justify-items: center;
@@ -546,36 +650,36 @@
     gap: 8px;
     padding: 16px 12px;
     background: var(--color-bg-card);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255,255,255,0.1);
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
-    min-width: 100px;
+    min-width: 100px;                    /* Minimum card width */
   }
 
   .boost-card:hover {
     background: var(--color-bg-card-hover);
-    border-color: rgba(0, 212, 255, 0.4);
-    transform: translateY(-2px);
+    border-color: rgba(0,212,255,0.4);
+    transform: translateY(-2px);         /* Lift on hover */
   }
 
   .boost-card--active {
-    border-color: var(--color-neon-cyan);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-    transform: scale(1.05);
+    border-color: var(--color-neon-cyan);/* Cyan border when active */
+    box-shadow: 0 0 20px rgba(0,212,255,0.4);
+    transform: scale(1.05);              /* Enlarge active card */
   }
 
   .boost-card__code {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(0.875rem, 1.2vw, 1rem);
+    font-size: clamp(0.875rem,1.2vw,1rem);
     text-transform: uppercase;
     color: var(--color-text-primary);
     letter-spacing: 0.05em;
   }
 
   .boost-card__votes {
-    display: flex;
+    display: flex;                       /* Count + label inline */
     align-items: baseline;
     gap: 4px;
   }
@@ -588,7 +692,7 @@
   }
 
   .boost-card__count--gold {
-    color: var(--color-neon-gold);
+    color: var(--color-neon-gold);       /* Gold for leading votes */
   }
 
   .boost-card__label {
@@ -599,44 +703,46 @@
     color: var(--color-text-secondary);
   }
 
-  /* Confetti Animation */
+  /* ==============================================================
+     LEADERBOARD PAGE — Confetti Celebration Animation
+     --------------------------------------------------------------
+     Summary: Fixed overlay spawning falling colored rectangles.
+     Each piece animates from top to bottom with rotation via CSS.
+     Dynamic pieces created in JSX with randomized positions.
+     ============================================================== */
   .confetti-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 100;
+    position: fixed;                     /* Full-screen overlay */
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;                /* Click-through */
+    z-index: 100;                        /* On top of everything */
     overflow: hidden;
   }
 
   .confetti-piece {
     position: absolute;
-    top: -20px;
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    animation: confetti-fall 3s ease-out forwards;
+    top: -20px;                          /* Start above viewport */
+    width: 10px; height: 10px;           /* Small square */
+    border-radius: 2px;                  /* Slightly rounded */
+    animation: confetti-fall 3s ease-out forwards; /* Drop + fade */
   }
 
   @keyframes confetti-fall {
-    0% {
-      transform: translateY(0) rotate(0deg);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(100vh) rotate(720deg);
-      opacity: 0;
-    }
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } /* 2 full spins */
   }
 
-  /* Winner Section */
+  /* ==============================================================
+     LEADERBOARD PAGE — Winner Champion Display
+     --------------------------------------------------------------
+     Summary: Large centered flag between gold laurel icons with
+     glowing gold country name. Scales in via winner-reveal keyframe.
+     ============================================================== */
   .winner-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 24px 16px 16px;
+    padding: 24px 16px 16px;             /* Top spacing for winner */
   }
 
   .winner-title {
@@ -648,59 +754,56 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 24px;
+    gap: 24px;                            /* Space flag ↔ laurels */
     margin-bottom: 16px;
   }
 
   .winner-flag {
-    max-width: 300px;
+    max-width: 300px;                     /* Large centered flag */
     width: 100%;
   }
 
   .laurel {
-    width: 60px;
-    height: 120px;
-    flex-shrink: 0;
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.4));
+    width: 60px; height: 120px;           /* Tall laurel icon */
+    flex-shrink: 0;                       /* Never squish */
+    filter: drop-shadow(0 0 8px rgba(255,215,0,0.4)); /* Gold glow */
   }
 
   .laurel--left {
-    transform: scaleX(1);
+    transform: scaleX(1);                 /* Face inward (default) */
   }
 
   .laurel--right {
-    transform: scaleX(-1);
+    transform: scaleX(-1);                /* Mirrored for right side */
   }
 
   .winner-name {
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-style: italic;
-    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700; font-style: italic;
+    font-size: clamp(2rem,4vw,3.5rem);    /* Big responsive text */
     text-transform: uppercase;
-    color: var(--color-text-gold);
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-    animation: winner-reveal 0.6s ease-out;
+    color: var(--color-text-gold);        /* Gold color */
+    text-shadow: 0 0 20px rgba(255,215,0,0.3); /* Gold halo */
+    animation: winner-reveal 0.6s ease-out; /* Pop-in animation */
   }
 
   @keyframes winner-reveal {
-    0% {
-      opacity: 0;
-      transform: scale(0.8);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
+    0%   { opacity: 0; transform: scale(0.8); }  /* Start small + hidden */
+    100% { opacity: 1; transform: scale(1); }     /* Full size + visible */
   }
 
-  /* Podium Cards */
+  /* ==============================================================
+     LEADERBOARD PAGE — Podium Cards (2nd-5th Place)
+     --------------------------------------------------------------
+     Summary: 4-column grid below winner showing rank, flag, and
+     name for 2nd through 5th place finishers.
+     ============================================================== */
   .podium {
-    display: grid;
+    display: grid;                       /* 4 equal columns */
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     width: 100%;
-    max-width: 800px;
+    max-width: 800px;                    /* Center with max width */
     margin-top: 24px;
     padding: 0 16px;
   }
@@ -712,7 +815,7 @@
     gap: 8px;
     padding: 16px 12px;
     background: var(--color-bg-card);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255,255,255,0.1);
     border-radius: 10px;
     text-align: center;
   }
@@ -720,28 +823,34 @@
   .podium-card__rank {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(0.875rem, 1vw, 1rem);
+    font-size: clamp(0.875rem,1vw,1rem);
     text-transform: uppercase;
-    color: var(--color-text-accent);
+    color: var(--color-text-accent);     /* Cyan rank number */
   }
 
   .podium-card__name {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 600;
-    font-size: clamp(0.65rem, 1vw, 0.875rem);
+    font-size: clamp(0.65rem,1vw,0.875rem);
     text-transform: uppercase;
     color: var(--color-text-secondary);
   }
 
-  /* Leaderboard Sidebar */
+  /* ==============================================================
+     LEADERBOARD PAGE — All-Time Wins Sidebar
+     --------------------------------------------------------------
+     Summary: Right panel showing global wins leaderboard. Each row:
+     rank (medal circle for top 3), flag, name, wins count (gold).
+     Medal borders set by inline style for gold/silver/bronze.
+     ============================================================== */
   .leaderboard-sidebar {
-    width: 320px;
-    flex-shrink: 0;
+    width: 320px;                        /* Fixed sidebar width */
+    flex-shrink: 0;                      /* Don't shrink on resize */
   }
 
   .leaderboard-panel {
     background: var(--color-bg-secondary);
-    border: 1px solid rgba(255, 215, 0, 0.3);
+    border: 1px solid rgba(255,215,0,0.3); /* Gold border */
     border-radius: 12px;
     padding: 16px;
     height: 100%;
@@ -759,18 +868,18 @@
   .leaderboard-panel__title {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(0.875rem, 1.2vw, 1rem);
+    font-size: clamp(0.875rem,1.2vw,1rem);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--color-neon-gold);
+    color: var(--color-neon-gold);       /* Gold heading */
   }
 
   .leaderboard-panel__title span {
-    color: var(--color-text-primary);
+    color: var(--color-text-primary);    /* White "DAILY" text */
   }
 
   .leaderboard-row {
-    display: grid;
+    display: grid;                       /* Rank | country | wins */
     grid-template-columns: 40px 1fr 50px;
     align-items: center;
     gap: 12px;
@@ -780,11 +889,11 @@
   }
 
   .leaderboard-row:nth-child(-n+3) {
-    background: rgba(255, 215, 0, 0.05);
+    background: rgba(255,215,0,0.05);   /* Gold tint for top 3 */
   }
 
   .leaderboard-row:hover {
-    background: rgba(0, 212, 255, 0.08);
+    background: rgba(0,212,255,0.08);   /* Cyan hover tint */
   }
 
   .leaderboard-row__rank {
@@ -794,17 +903,16 @@
   }
 
   .medal-circle {
-    width: 28px;
-    height: 28px;
+    width: 28px; height: 28px;           /* Circular medal badge */
     border-radius: 50%;
-    border: 2px solid;
+    border: 2px solid;                   /* Color set by inline style */
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
     font-size: 12px;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0,0,0,0.3);         /* Transparent fill */
   }
 
   .rank-number {
@@ -812,8 +920,7 @@
     font-weight: 700;
     font-size: 14px;
     color: var(--color-text-secondary);
-    width: 28px;
-    height: 28px;
+    width: 28px; height: 28px;           /* Match medal size */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -828,7 +935,7 @@
   .leaderboard-row__name {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 600;
-    font-size: clamp(0.75rem, 1vw, 0.875rem);
+    font-size: clamp(0.75rem,1vw,0.875rem);
     color: var(--color-text-primary);
     text-transform: uppercase;
   }
@@ -842,16 +949,22 @@
   }
 
   .leaderboard-row__wins--gold {
-    color: var(--color-neon-gold);
+    color: var(--color-neon-gold);       /* Gold wins for top 3 */
   }
 
-  /* Settings Page */
+  /* ==============================================================
+     SETTINGS PAGE — Layout & Structure
+     --------------------------------------------------------------
+     Summary: Two-column layout with vertical tab sidebar (left) and
+     content panel (right). Tabs: General, Audio, Display, Gameplay,
+     Voting, Countries, Advanced. Each tab renders different content.
+     ============================================================== */
   .settings-page {
-    flex: 1;
+    flex: 1;                             /* Fill available space */
     display: flex;
     flex-direction: column;
     padding: 0 16px 16px;
-    min-height: 0;
+    min-height: 0;                       /* Allow flex shrink */
   }
 
   .settings-title {
@@ -862,25 +975,25 @@
   .settings-title__text {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(1.8rem, 3.5vw, 3rem);
+    font-size: clamp(1.8rem,3.5vw,3rem);
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.15em;              /* Wide spacing */
     color: var(--color-text-primary);
   }
 
   .settings-layout {
-    display: flex;
+    display: flex;                       /* Sidebar + panel side by side */
     flex: 1;
     gap: 16px;
     min-height: 0;
   }
 
-  /* Sidebar Tabs */
+  /* ---- Settings Sidebar Tabs (vertical nav) ---- */
   .settings-sidebar {
-    width: 200px;
+    width: 200px;                        /* Fixed tab panel width */
     flex-shrink: 0;
     background: var(--color-bg-secondary);
-    border: 1px solid rgba(0, 212, 255, 0.2);
+    border: 1px solid rgba(0,212,255,0.2);
     border-radius: 12px;
     padding: 8px;
   }
@@ -906,18 +1019,18 @@
   }
 
   .settings-tab:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255,255,255,0.05);
     color: var(--color-text-primary);
   }
 
   .settings-tab--active {
-    background: var(--color-neon-cyan);
-    color: var(--color-bg-primary);
+    background: var(--color-neon-cyan);  /* Cyan fill = active */
+    color: var(--color-bg-primary);      /* Dark text on cyan */
   }
 
   .settings-tab--active:hover {
     background: var(--color-neon-cyan);
-    filter: brightness(1.1);
+    filter: brightness(1.1);             /* Slightly brighter */
   }
 
   .settings-tab__icon {
@@ -933,31 +1046,31 @@
     letter-spacing: 0.05em;
   }
 
-  /* Settings Panel */
+  /* ---- Settings Content Panel (right side) ---- */
   .settings-panel {
-    flex: 1;
+    flex: 1;                             /* Fill remaining width */
     background: var(--color-bg-secondary);
-    border: 1px solid rgba(0, 212, 255, 0.2);
+    border: 1px solid rgba(0,212,255,0.2);
     border-radius: 12px;
     padding: 20px 24px;
-    overflow-y: auto;
+    overflow-y: auto;                    /* Scrollable content */
     min-height: 0;
   }
 
   .settings-panel__title {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    font-size: clamp(1.25rem,2vw,1.5rem);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--color-text-primary);
     margin-bottom: 24px;
     padding-bottom: 12px;
-    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    border-bottom: 1px solid rgba(0,212,255,0.2); /* Cyan divider */
   }
 
   .settings-panel__content {
-    max-width: 700px;
+    max-width: 700px;                    /* Readable content width */
   }
 
   .settings-content {
@@ -966,6 +1079,7 @@
     gap: 16px;
   }
 
+  /* Each setting: [icon] [title+subtitle] [control] */
   .settings-row {
     display: flex;
     align-items: center;
@@ -984,9 +1098,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    color: var(--color-text-accent);
+    width: 40px; height: 40px;
+    color: var(--color-text-accent);     /* Cyan icon */
     flex-shrink: 0;
   }
 
@@ -1001,7 +1114,7 @@
   .settings-row__title {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(0.8rem, 1.2vw, 1rem);
+    font-size: clamp(0.8rem,1.2vw,1rem);
     text-transform: uppercase;
     color: var(--color-text-primary);
   }
@@ -1009,30 +1122,34 @@
   .settings-row__subtitle {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 400;
-    font-size: clamp(0.65rem, 1vw, 0.8rem);
+    font-size: clamp(0.65rem,1vw,0.8rem);
     color: var(--color-text-secondary);
   }
 
   .settings-row__control {
-    flex-shrink: 0;
+    flex-shrink: 0;                      /* Control stays fixed size */
   }
 
   .settings-danger-zone {
-    background: rgba(255, 23, 68, 0.05);
-    border: 1px solid rgba(255, 23, 68, 0.2);
+    background: rgba(255,23,68,0.05);    /* Red-tinted section */
+    border: 1px solid rgba(255,23,68,0.2);
     border-radius: 10px;
   }
 
-  /* Settings Actions */
   .settings-actions {
-    display: flex;
+    display: flex;                       /* Save / Cancel buttons */
     justify-content: center;
     gap: 16px;
     margin-top: 24px;
     padding-top: 16px;
   }
 
-  /* Slider */
+  /* ==============================================================
+     SLIDER COMPONENT — Custom Range Slider (e.g. volume)
+     --------------------------------------------------------------
+     Summary: Layered divs: track bg, cyan fill, hidden native input
+     (captures clicks), custom thumb circle, and numeric readout.
+     ============================================================== */
   .slider-container {
     display: flex;
     align-items: center;
@@ -1041,30 +1158,27 @@
   }
 
   .slider-track {
-    position: relative;
+    position: relative;                  /* Contains fill + input + thumb */
     flex: 1;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.15);
+    height: 4px;                         /* Thin line */
+    background: rgba(255,255,255,0.15);  /* Dim track bg */
     border-radius: 2px;
   }
 
   .slider-fill {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     height: 100%;
-    background: var(--color-neon-cyan);
+    background: var(--color-neon-cyan);  /* Cyan fill */
     border-radius: 2px;
-    pointer-events: none;
+    pointer-events: none;                /* Click passes to input */
   }
 
   .slider-input {
     position: absolute;
-    top: -8px;
-    left: 0;
-    width: 100%;
-    height: 20px;
-    opacity: 0;
+    top: -8px; left: 0;                  /* Extend hit area */
+    width: 100%; height: 20px;
+    opacity: 0;                          /* Hidden native input */
     cursor: pointer;
     margin: 0;
   }
@@ -1072,12 +1186,11 @@
   .slider-thumb {
     position: absolute;
     top: 50%;
-    width: 16px;
-    height: 16px;
+    width: 16px; height: 16px;           /* Custom thumb circle */
     background: white;
     border-radius: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 6px rgba(0, 212, 255, 0.6);
+    transform: translate(-50%,-50%);      /* Center on fill edge */
+    box-shadow: 0 0 6px rgba(0,212,255,0.6); /* Cyan glow */
     pointer-events: none;
   }
 
@@ -1087,15 +1200,19 @@
     font-size: 14px;
     color: var(--color-neon-cyan);
     min-width: 32px;
-    text-align: right;
+    text-align: right;                   /* Align numeric readout */
   }
 
-  /* Toggle Switch */
+  /* ==============================================================
+     TOGGLE SWITCH COMPONENT — On/Off Pill Button
+     --------------------------------------------------------------
+     Summary: Pill-shaped toggle. ON = cyan filled with "ON" text,
+     OFF = dim gray with "OFF" text. Used in settings rows.
+     ============================================================== */
   .toggle-switch {
     position: relative;
-    width: 44px;
-    height: 24px;
-    border-radius: 12px;
+    width: 44px; height: 24px;           /* Pill dimensions */
+    border-radius: 12px;                 /* Fully rounded ends */
     border: none;
     cursor: pointer;
     display: flex;
@@ -1106,12 +1223,12 @@
   }
 
   .toggle-switch--off {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255,255,255,0.15);  /* Dim gray when off */
   }
 
   .toggle-switch--on {
-    background: var(--color-neon-cyan);
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    background: var(--color-neon-cyan);  /* Cyan when on */
+    box-shadow: 0 0 10px rgba(0,212,255,0.5);
   }
 
   .toggle-switch--disabled {
@@ -1129,16 +1246,22 @@
   }
 
   .toggle-label--off {
-    color: var(--color-text-secondary);
+    color: var(--color-text-secondary);  /* Gray "OFF" text */
   }
 
   .toggle-label--on {
-    color: var(--color-bg-primary);
+    color: var(--color-bg-primary);      /* Dark "ON" text on cyan */
   }
 
-  /* Dropdown */
+  /* ==============================================================
+     DROPDOWN COMPONENT — Custom Select Menu
+     --------------------------------------------------------------
+     Summary: Built from scratch (no native <select>). Trigger button
+     shows current value + chevron arrow. Absolutely positioned menu
+     with clickable options. Arrow rotates 180° when open.
+     ============================================================== */
   .dropdown {
-    position: relative;
+    position: relative;                  /* Anchor for menu */
     min-width: 120px;
   }
 
@@ -1150,18 +1273,18 @@
     gap: 8px;
     padding: 8px 12px;
     background: var(--color-bg-card);
-    border: 1px solid rgba(0, 212, 255, 0.3);
+    border: 1px solid rgba(0,212,255,0.3);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .dropdown-trigger:hover {
-    border-color: rgba(0, 212, 255, 0.6);
+    border-color: rgba(0,212,255,0.6);
   }
 
   .dropdown-trigger--open {
-    border-color: var(--color-neon-cyan);
+    border-color: var(--color-neon-cyan);/* Cyan when menu open */
   }
 
   .dropdown-trigger__label {
@@ -1172,28 +1295,26 @@
   }
 
   .dropdown-trigger__arrow {
-    width: 16px;
-    height: 16px;
+    width: 16px; height: 16px;
     color: var(--color-neon-cyan);
     transition: transform 0.2s ease;
     flex-shrink: 0;
   }
 
   .dropdown-trigger__arrow--open {
-    transform: rotate(180deg);
+    transform: rotate(180deg);           /* Flip arrow up */
   }
 
   .dropdown-menu {
     position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
+    top: calc(100% + 4px);              /* Below trigger */
+    left: 0; right: 0;
     background: var(--color-bg-card);
-    border: 1px solid rgba(0, 212, 255, 0.3);
+    border: 1px solid rgba(0,212,255,0.3);
     border-radius: 6px;
     overflow: hidden;
-    z-index: 50;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 50;                         /* Above other content */
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4); /* Drop shadow */
   }
 
   .dropdown-option {
@@ -1216,36 +1337,41 @@
   }
 
   .dropdown-option--selected {
-    color: var(--color-neon-cyan);
+    color: var(--color-neon-cyan);       /* Cyan = selected */
   }
 
-  /* ===================== LOBBY PAGE ===================== */
-
+  /* ==============================================================
+     LOBBY PAGE — Full-Screen Layout
+     --------------------------------------------------------------
+     Summary: Four vertical sections — header with countdown, 2×4
+     team grid, action buttons (Start/Reset), and infinite scrolling
+     flag banner. Full viewport, no scroll.
+     ============================================================== */
   .lobby-page {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+    height: 100vh; width: 100vw;          /* Full viewport */
+    overflow: hidden;                     /* No page scroll */
   }
 
+  /* ---- Lobby Header: title + countdown + icon buttons ---- */
   .lobby-header {
-    flex: 0 0 auto;
+    flex: 0 0 auto;                       /* Don't grow/shrink */
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: clamp(8px, 1.5vh, 20px) clamp(16px, 2vw, 40px);
-    position: relative;
+    padding: clamp(8px,1.5vh,20px) clamp(16px,2vw,40px);
+    position: relative;                   /* For absolute icon btns */
   }
 
   .lobby-icon-btn {
-    position: absolute;
-    width: clamp(40px, 4vw, 56px);
-    height: clamp(40px, 4vw, 56px);
-    background: rgba(10, 22, 40, 0.9);
-    border: 2px solid rgba(255, 255, 255, 0.25);
-    border-radius: clamp(6px, 0.8vw, 10px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    position: absolute;                   /* Floated left/right */
+    width: clamp(40px,4vw,56px);
+    height: clamp(40px,4vw,56px);
+    background: rgba(10,22,40,0.9);
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: clamp(6px,0.8vw,10px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1255,32 +1381,29 @@
 
   .lobby-icon-btn:hover {
     filter: brightness(1.15);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.6);
   }
 
   .lobby-icon-btn--left {
-    left: clamp(16px, 2vw, 40px);
-    top: 50%;
-    transform: translateY(-50%);
+    left: clamp(16px,2vw,40px);
+    top: 50%; transform: translateY(-50%); /* Vertically center */
   }
 
   .lobby-icon-btn--right {
-    right: clamp(16px, 2vw, 40px);
-    top: 50%;
-    transform: translateY(-50%);
+    right: clamp(16px,2vw,40px);
+    top: 50%; transform: translateY(-50%);
   }
 
   .lobby-icon-btn__icon {
-    width: clamp(18px, 1.8vw, 26px);
-    height: clamp(18px, 1.8vw, 26px);
-    color: #00d4ff;
+    width: clamp(18px,1.8vw,26px);
+    height: clamp(18px,1.8vw,26px);
+    color: #00d4ff;                       /* Cyan icon */
   }
 
   .lobby-title {
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-style: italic;
-    font-size: clamp(2rem, 4.5vw, 4rem);
+    font-weight: 700; font-style: italic;
+    font-size: clamp(2rem,4.5vw,4rem);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: white;
@@ -1288,112 +1411,106 @@
   }
 
   .lobby-title__of {
-    color: #00d4ff;
+    color: #00d4ff;                       /* Cyan "OF" for emphasis */
   }
 
   .lobby-countdown {
-    display: flex;
+    display: flex;                       /* Inline pill layout */
     align-items: center;
-    gap: clamp(8px, 1vw, 16px);
-    background: rgba(5, 10, 26, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    gap: clamp(8px,1vw,16px);
+    background: rgba(5,10,26,0.85);
+    border: 1px solid rgba(255,255,255,0.2);
     border-radius: 8px;
-    padding: clamp(4px, 0.6vh, 8px) clamp(12px, 1.5vw, 24px);
-    margin-top: clamp(4px, 0.8vh, 10px);
+    padding: clamp(4px,0.6vh,8px) clamp(12px,1.5vw,24px);
+    width: fit-content;                  /* Shrink-wrap to content */
+    margin: clamp(4px,0.8vh,10px) auto 0; /* Centered horizontally */
   }
 
   .lobby-countdown__label {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 600;
-    font-size: clamp(0.7rem, 1vw, 0.9rem);
+    font-size: clamp(0.7rem,1vw,0.9rem);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: white;
   }
 
-  /* Team Grid Section */
+  /* ---- Team Grid: 2 rows x 4 columns ---- */
   .team-grid-section {
-    flex: 1;
+    flex: 1;                             /* Fill remaining space */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: clamp(8px, 1.5vh, 20px) clamp(16px, 2.5vw, 48px);
+    padding: clamp(4px,1vh,18px) clamp(16px,2.5vw,48px);
     min-height: 0;
   }
 
   .team-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, clamp(145px,16vw,225px)));
     grid-template-rows: repeat(2, 1fr);
-    gap: clamp(8px, 1.2vw, 20px);
-    height: 100%;
+    gap: clamp(6px,1vw,16px);
+    width: 100%;
+    justify-content: center;
   }
 
   .team-card {
-    border-radius: clamp(6px, 0.8vw, 12px);
-    background: #0d1f3c;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    width: 100%;
+    aspect-ratio: 3/2;
+    position: relative;
     overflow: hidden;
-    min-height: 0;
-    padding: clamp(8px, 1vh, 16px);
-    gap: clamp(4px, 0.6vh, 8px);
+    border-radius: clamp(6px,0.8vw,12px);
+    background: #0d1f3c;
+    box-sizing: border-box;
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .team-card--filled {
     border: 2px solid #00d4ff;
-    box-shadow: 0 0 clamp(8px, 1.2vw, 20px) rgba(0, 212, 255, 0.35);
+    box-shadow: 0 0 clamp(8px,1.2vw,20px) rgba(0,212,255,0.35);
   }
 
   .team-card--filled:hover {
-    filter: brightness(1.1);
+    filter: brightness(1.1);             /* Brighten on hover */
   }
 
   .team-card--empty {
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255,255,255,0.1);
     opacity: 0.7;
     cursor: default;
   }
 
-  .card-flag {
-    width: 85%;
-    aspect-ratio: 3/2;
+  .team-card-flag {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: clamp(4px, 0.8vh, 10px);
+    border-radius: inherit;
+    display: block;
   }
 
-  .card-display-code {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(0.9rem, 1.4vw, 1.3rem);
-    font-weight: 700;
-    color: white;
-    text-transform: uppercase;
-    line-height: 1.1;
-  }
-
-  .card-country-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(0.65rem, 0.9vw, 0.9rem);
-    color: #94a3b8;
-    margin-top: 2px;
-    text-transform: uppercase;
+  .team-card__empty-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(4px,0.6vh,8px);
   }
 
   .team-card__icon {
-    width: clamp(28px, 3vw, 48px);
-    height: clamp(28px, 3vw, 48px);
-    color: #4a5568;
+    width: clamp(28px,3vw,48px);
+    height: clamp(28px,3vw,48px);
+    color: #4a5568;                      /* Gray placeholder icon */
   }
 
   .team-card__label {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(0.8rem, 1.2vw, 1.1rem);
+    font-size: clamp(0.8rem,1.2vw,1.1rem);
     color: white;
     text-transform: uppercase;
   }
@@ -1401,66 +1518,67 @@
   .team-card__waiting {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 400;
-    font-size: clamp(0.6rem, 0.85vw, 0.8rem);
-    color: #4a5568;
+    font-size: clamp(0.6rem,0.85vw,0.8rem);
+    color: #4a5568;                      /* Waiting gray */
   }
 
-  /* Action Buttons */
+  /* ---- Action Buttons (Start / Reset) ---- */
   .lobby-buttons {
     flex: 0 0 auto;
     display: flex;
-    gap: clamp(8px, 1.2vw, 20px);
+    gap: clamp(8px,1.2vw,20px);
     justify-content: center;
-    padding: clamp(6px, 1vh, 14px) 0;
+    padding: clamp(4px,0.6vh,12px) 0 clamp(8px,1.2vh,18px) 0;
+    flex-shrink: 0;
   }
 
   .lobby-btn {
-    height: clamp(40px, 5vh, 58px);
-    min-width: clamp(160px, 14vw, 240px);
-    border-radius: clamp(6px, 0.6vw, 10px);
+    height: clamp(44px,5.5vh,60px);
+    min-width: clamp(160px,14vw,240px);
+    border-radius: clamp(6px,0.6vw,10px);
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: clamp(0.8rem, 1.1vw, 1rem);
+    font-size: clamp(0.8rem,1.1vw,1rem);
     text-transform: uppercase;
     letter-spacing: 0.08em;
+    color: white;
     cursor: pointer;
     transition: filter 0.15s, box-shadow 0.15s;
-    border: 2px solid;
+    flex-shrink: 0;
   }
 
   .lobby-btn--start {
     background: #22c55e;
-    border-color: #16a34a;
-    box-shadow: 0 0 14px rgba(34, 197, 94, 0.45);
-    color: white;
+    border: 1px solid #16a34a;
+    box-shadow: 0 0 14px rgba(34,197,94,0.45);
   }
 
   .lobby-btn--start:hover {
     filter: brightness(1.12);
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+    box-shadow: 0 0 20px rgba(34,197,94,0.6);
   }
 
   .lobby-btn--reset {
     background: #c0213a;
-    border-color: #9b1a2e;
-    box-shadow: 0 0 14px rgba(192, 33, 58, 0.45);
-    color: white;
+    border: 1px solid #9b1a2e;
+    box-shadow: 0 0 14px rgba(192,33,58,0.45);
   }
 
   .lobby-btn--reset:hover {
     filter: brightness(1.12);
-    box-shadow: 0 0 20px rgba(192, 33, 58, 0.6);
+    box-shadow: 0 0 20px rgba(192,33,58,0.6);
   }
 
-  /* Banner Section */
+  /* ---- Infinite Scrolling Flag Banner (bottom section) ---- */
   .banner-section {
     flex: 0 0 auto;
-    height: clamp(140px, 26vh, 240px);
+    height: clamp(110px,18vh,170px);
     display: flex;
     flex-direction: column;
-    background: rgba(6, 13, 30, 0.97);
-    border-top: 1px solid rgba(0, 212, 255, 0.2);
-    padding-top: clamp(8px, 1.2vh, 16px);
+    background: rgba(6,13,30,0.97);
+    border-top: 1px solid rgba(0,212,255,0.2);
+    padding: clamp(18px,2.5vh,28px) 0 clamp(6px,1vh,12px);
+    gap: clamp(4px,0.8vh,10px);
     overflow: hidden;
   }
 
@@ -1468,11 +1586,11 @@
     text-align: center;
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 600;
-    font-size: clamp(0.7rem, 1vw, 0.95rem);
+    font-size: clamp(0.9rem,1.4vw,1.3rem);
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: white;
-    margin: 0 0 clamp(8px, 1.2vh, 14px) 0;
+    margin: 0;
     flex: 0 0 auto;
   }
 
@@ -1486,54 +1604,390 @@
   .banner-track {
     display: flex;
     align-items: center;
-    gap: clamp(24px, 3vw, 56px);
-    width: max-content;
-    animation: marquee 55s linear infinite;
-    padding: 0 clamp(12px, 1.5vw, 24px);
+    gap: clamp(24px,3vw,56px);
+    width: max-content;                  /* Expand with duplicated items */
+    animation: marquee 55s linear infinite; /* Slow scroll */
+    padding: 0 clamp(12px,1.5vw,24px);
   }
 
   @keyframes marquee {
     from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    to { transform: translateX(-50%); }  /* 50% = items duplicated in JSX */
   }
 
   .banner-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(3px, 0.5vh, 6px);
+    gap: clamp(3px,0.5vh,6px);          /* Gap between flag and name */
     cursor: pointer;
     flex-shrink: 0;
   }
 
   .banner-item:hover .banner-flag {
-    border-color: rgba(0, 212, 255, 0.6);
-    box-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+    border-color: rgba(0,212,255,0.6);
+    box-shadow: 0 0 8px rgba(0,212,255,0.3);
   }
 
   .banner-flag {
-    width: clamp(48px, 5vw, 80px);
+    height: clamp(43px,6vh,72px);         /* 20% larger than original */
+    width: auto;
     aspect-ratio: 4/3;
     object-fit: cover;
     border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255,255,255,0.2);
+    display: block;
+    flex-shrink: 0;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
 
   .banner-name {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(0.6rem, 0.85vw, 0.8rem);
-    color: white;
-    white-space: nowrap;
+    font-size: clamp(0.65rem,0.9vw,0.85rem);
+    font-weight: 600;
+    color: #ffffff;
     text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1.1;
   }
 
   .banner-code {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(0.55rem, 0.75vw, 0.75rem);
-    color: #00d4ff;
+    font-size: clamp(0.6rem,0.8vw,0.8rem);
     font-weight: 700;
-    white-space: nowrap;
+    color: #00d4ff;
     text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1.1;
+  }
+
+  /* ==============================================================
+     RACE PAGE — Full-Screen Race View
+     --------------------------------------------------------------
+     Summary: Animated track with car sprites positioned via CSS
+     custom property --car-progress. Sections: header with leader
+     pill, track area with animated background, vote/boost panel.
+     ============================================================== */
+  .race-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; width: 100vw;
+    overflow: hidden;
+  }
+
+  /* ---- Leader Pill: gold-bordered current leader indicator ---- */
+  .leader-pill {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px,1vw,14px);
+    background: rgba(5,10,26,0.9);
+    border: 2px solid #ffd700;           /* Gold border for leader */
+    border-radius: clamp(6px,0.8vw,10px);
+    padding: clamp(4px,0.6vh,8px) clamp(12px,1.5vw,22px);
+    position: relative;
+    margin: clamp(4px,0.8vh,10px) auto 0; /* Centered below GameHeader */
+    width: fit-content;
+  }
+
+  .crown-icon {
+    position: absolute;
+    top: -14px;                          /* Above the pill border */
+    left: 50%; transform: translateX(-50%);
+    color: #ffd700;
+    font-size: clamp(14px,1.4vw,20px);
+    width: clamp(14px,1.4vw,20px);
+    height: clamp(14px,1.4vw,20px);
+  }
+
+  .leader-flag {
+    width: clamp(28px,2.8vw,42px);
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 3px;
+  }
+
+  .leader-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .leader-code {
+    font-size: clamp(0.9rem,1.3vw,1.2rem);
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .leader-label {
+    font-size: clamp(0.55rem,0.8vw,0.75rem);
+    color: #ffd700;                      /* Gold "CURRENT LEADER" */
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* ---- Race Track Area (animated road + lanes) ---- */
+  .track-area {
+    flex: 1;                             /* Fill remaining height */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: #2a2a2a;           /* Dark road surface */
+  }
+
+  .track-bg {
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(         /* Subtle horizontal road lines */
+        90deg, transparent, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px
+      );
+  }
+
+  .track-scroll-layer {
+    position: absolute; inset: 0;
+    width: 200vw;                        /* Double width for seamless scroll */
+    animation: trackScroll 8s linear infinite; /* Moving road effect */
+  }
+
+  .track-lines {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient( /* Marker lines every 100px */
+      90deg, transparent, transparent 100px, rgba(255,255,255,0.03) 100px, rgba(255,255,255,0.03) 102px
+    );
+  }
+
+  @keyframes trackScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .lanes-container {
+    position: relative;
+    z-index: 2;                          /* Above background layers */
+    display: flex;
+    flex-direction: column;              /* Stack lanes vertically */
+    height: 100%;
+  }
+
+  .lane-row {
+    flex: 1;                             /* Equal height per lane */
+    display: flex;
+    align-items: center;
+    border-bottom: 1px dashed rgba(255,255,255,0.15); /* Dashed lane divider */
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lane-row:first-child {
+    border-top: 1px dashed rgba(255,255,255,0.15); /* Top border for first lane */
+  }
+
+  .lane-row.racing .car-sprite-wrapper {
+    animation: laneVibrate 0.12s ease-in-out infinite; /* Engine rumble */
+  }
+
+  @keyframes laneVibrate {
+    0%   { transform: translateX(-50%) translateY(0); }
+    25%  { transform: translateX(-50%) translateY(-1.5px); }
+    75%  { transform: translateX(-50%) translateY(1.5px); }
+    100% { transform: translateX(-50%) translateY(0); }
+  }
+
+  .lane-info {
+    flex: 0 0 auto;                      /* Fixed left panel */
+    display: flex;
+    align-items: center;
+    gap: clamp(6px,0.8vw,12px);
+    padding: 0 clamp(8px,1vw,16px);
+    width: clamp(100px,10vw,160px);
+    z-index: 3;
+    background: linear-gradient(to right, rgba(26,26,46,0.95) 70%, transparent); /* Fade edge */
+  }
+
+  .lane-flag {
+    width: clamp(22px,2.2vw,34px);
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 3px;
+  }
+
+  .lane-code {
+    font-size: clamp(0.75rem,1.1vw,1rem);
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  /* Car sprite: positioned via --car-progress CSS var (0-100 = 0%-100%) */
+  .car-sprite-wrapper {
+    position: absolute;
+    left: calc(var(--car-progress,50) * 1%); /* Progress-based position */
+    transform: translateX(-50%);          /* Center on progress point */
+    transition: left 0.25s linear;       /* Smooth movement */
+    z-index: 4;
+    display: flex;
+    align-items: center;
+  }
+
+  .car-sprite {
+    filter: drop-shadow(-6px 0 4px rgba(255,200,50,0.55)); /* Headlight glow */
+  }
+
+  .boost-badge {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 5px;
+    padding: 2px 6px;
+    margin-left: clamp(4px,0.5vw,8px);
+    white-space: nowrap;
+  }
+
+  .boost-icon {
+    color: #ffd700;                      /* Gold boost icon */
+    font-size: clamp(10px,1vw,14px);
+  }
+
+  .boost-count {
+    color: white;
+    font-weight: 700;
+    font-size: clamp(10px,1vw,14px);
+  }
+
+  /* ---- Finish Line (checkered flag pattern) ---- */
+  .finish-line {
+    position: absolute;
+    right: clamp(24px,2.5vw,40px);
+    top: 0; bottom: 0;
+    width: clamp(20px,2vw,32px);         /* Thin vertical strip */
+    background-image: repeating-conic-gradient(#000 0% 25%, #fff 0% 50%); /* Checkerboard */
+    background-size: 16px 16px;          /* Square tile size */
+    z-index: 5;
+    opacity: 0.85;
+  }
+
+  /* ---- Vote / Boost Panel (bottom of race screen) ---- */
+  .vote-panel {
+    flex: 0 0 auto;                      /* Fixed height bottom panel */
+    height: clamp(140px,26vh,240px);
+    background: rgba(6,13,30,0.97);
+    border-top: 1px solid rgba(0,212,255,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(8px,1.2vh,14px) clamp(16px,2vw,32px);
+    gap: clamp(8px,1.2vh,14px);
+  }
+
+  .vote-heading {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: clamp(0.7rem,1vw,0.95rem);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: white;
+    margin: 0;
+    flex: 0 0 auto;
+  }
+
+  .vote-cards-row {
+    display: flex;                       /* Horizontal card row */
+    gap: clamp(8px,1.2vw,18px);
+    align-items: stretch;
+    justify-content: center;
+    flex: 1;
+  }
+
+  .vote-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(3px,0.5vh,6px);
+    background: rgba(13,31,60,0.9);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: clamp(6px,0.8vw,10px);
+    padding: clamp(6px,1vh,12px) clamp(8px,1vw,14px);
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+    min-width: clamp(70px,8vw,120px);
+  }
+
+  .vote-card:hover {
+    border-color: rgba(0,212,255,0.5);
+    box-shadow: 0 0 12px rgba(0,212,255,0.25);
+  }
+
+  .vote-card:active {
+    transform: scale(0.95);              /* Press effect */
+  }
+
+  .vote-card.boosting {
+    border-color: #ffd700;               /* Gold when boosting */
+    box-shadow: 0 0 16px rgba(255,215,0,0.5);
+    animation: boostFlash 0.3s ease-out;
+  }
+
+  @keyframes boostFlash {
+    0%   { background: rgba(255,215,0,0.25); }  /* Gold flash */
+    100% { background: rgba(13,31,60,0.9); }     /* Back to normal */
+  }
+
+  .vote-flag {
+    width: 85%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .vote-code {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(0.8rem,1.1vw,1rem);
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  .vote-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(0.6rem,0.85vw,0.8rem);
+    color: #00d4ff;                      /* Cyan country name */
+    text-transform: uppercase;
+  }
+
+  .vote-count {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(0.55rem,0.75vw,0.75rem);
+    color: #94a3b8;
+  }
+
+  /* ---- Race Finish Button (floating green "FINISH RACE") ---- */
+  .race-finish-btn {
+    position: absolute;
+    bottom: clamp(150px,28vh,260px);     /* Above vote panel */
+    left: 50%; transform: translateX(-50%);
+    background: #22c55e;                 /* Green action */
+    border: 2px solid #16a34a;
+    border-radius: clamp(6px,0.6vw,10px);
+    box-shadow: 0 0 14px rgba(34,197,94,0.45);
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.8rem,1.1vw,1rem);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: clamp(10px,1.5vh,16px) clamp(24px,3vw,48px);
+    cursor: pointer;
+    transition: filter 0.15s, box-shadow 0.15s;
+    z-index: 10;                         /* Above track layers */
+  }
+
+  .race-finish-btn:hover {
+    filter: brightness(1.12);
+    box-shadow: 0 0 20px rgba(34,197,94,0.6);
   }
 }

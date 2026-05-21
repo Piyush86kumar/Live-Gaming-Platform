@@ -1,145 +1,402 @@
 # Project Status
 
 ## What is this project?
-`race_of_nations` is a browser-based frontend for a multiplayer-style racing game experience. It is built with React and TypeScript using Vite as the bundler, and it focuses on a neon-themed UI with screens for lobby management, racing, leaderboard display, and game settings.
+`race_of_nations` is a browser-based multiplayer racing game frontend built with React 18 + TypeScript and Vite. Players select countries in a lobby, watch a real-time race with a boost/vote system, and see results on a leaderboard. No live backend — all state is client-side mock.
+
+---
 
 ## Current Status
 
-### Overall: ✅ LobbyPage Redesigned
-The LobbyPage has been completely redesigned to match the lobby_design.md specification. The app builds successfully with no TypeScript errors.
+### Overall: ✅ LobbyPage & RacePage Redesigned
+- Both LobbyPage and RacePage have been redesigned per design specifications
+- Build passes with no TypeScript errors
+- Tech stack: React 19, TypeScript 5.6, Vite 6, Zustand 5, Tailwind CSS 4, lucide-react 0.460
 
-### Recent Changes
+### Build Commands
+```bash
+npm run dev      # Start development server
+npm run build    # TypeScript check + production build
+npm run preview  # Preview production build
+```
 
-#### 1. LobbyPage Redesign (COMPLETED)
-- **New responsive layout** using flexbox with `clamp()` for viewport-relative sizing
-- **Custom header** with chunky rounded icon buttons (Home/Settings) and centered title
-- **Flag-dominant team cards** where filled slots show large flag images
-- **Infinite scroll banner** with continuous animation (no pause on hover)
-- **Click-to-remove** on filled team cards removes the country
-- **Viewportion-relative sizing** throughout (no fixed px for layout)
+---
 
-#### 2. Data Model Updates
-- **Country interface** now includes `code` (lowercase ISO), `displayCode` (3-letter like "USA"), and `name`
-- All `COUNTRIES` array updated to use lowercase codes matching asset filenames
-- `MOCK_PLAYERS` updated with `displayCode` field
+## Tech Stack
 
-#### 3. Store Updates
-- Added `removeCountry(teamNumber)` action to remove a country from a slot
+| Category | Technology |
+|---------|------------|
+| Framework | React 19.0.0 |
+| Language | TypeScript 5.6 |
+| Bundler | Vite 6.4.2 |
+| State Management | Zustand 5.0.0 |
+| Styling | Tailwind CSS 4 + @tailwindcss/vite |
+| Routing | React Router DOM 7.0.0 |
+| Icons | lucide-react 0.460.0 |
+| Utilities | clsx 2.1.1, tailwind-merge 2.6.0 |
 
-#### 4. UI Component Fixes
-- **NeonButton**: Green/danger button colors corrected to #22c55e and #c0213a
-- **CountdownTimer**: Magenta color (#ff00aa) fixed
-- **CountryFlag**: Added `xl` (72x48) and `banner` (24x16) size options
+---
 
-#### 5. SettingsPage Fixes
-- Updated button variants (red→danger, green→primary, blue→secondary) for NeonButton compatibility
+## Recent Changes
 
-## Project goal
-The goal is to deliver a polished, static frontend for a racing game UI that can be deployed to platforms like Vercel, Netlify, GitHub Pages, or Cloudflare Pages. The app should provide a complete user flow from lobby setup through race play and leaderboard review, with strong visual polish and responsive UI behavior.
+### 1. LobbyPage Redesign (COMPLETED)
+- **Layout**: Flexbox column, 100vh, no scroll, `clamp()` sizing throughout
+- **Header**: Uses shared `GameHeader` component with screen-corner Home/Settings buttons, centered title "RACE OF NATIONS" with "OF" in cyan
+- **Countdown pill**: "RACE STARTING IN" label + magenta digits, inline pill with `fit-content` + centered
+- **Team Grid**: 2 rows × 4 columns, clamped column width `minmax(0, clamp(150px,15vw,220px))`, centered
+- **Team Cards**:
+  - Filled: Flag fills entire card via `position: absolute; inset: 0`, `aspect-ratio: 3/2`, no text
+  - Empty: Users icon + "TEAM N" + "Waiting..."
+  - Click filled card to remove country
+- **Buttons**: START RACE (green #22c55e), RESET TIMER (red #c0213a), `flex-shrink: 0` to prevent squishing
+- **Banner**: Infinite scroll, no pause on hover, 55s animation, height-based flag sizing `clamp(43px,6vh,72px)`
 
-## Folder structure and file responsibilities
+### 2. RacePage Redesign (COMPLETED)
+- Now uses `bg-track` variant (asphalt dark surface) instead of `bg-stadium`
+- **Header**: Same style as LobbyPage
+- **Leader Pill**: Crown icon above, gold border, flag + code + "LEADER" label
+- **Track Area** (flex: 1):
+  - Scrolling asphalt background (200vw, 8s animation)
+  - Lane rows with dashed dividers
+  - Left info panel: flag + country code (fixed, gradient fade)
+  - Car sprites positioned by `progress%` with `translateX(-50%)`
+  - Lane vibration animation when racing
+  - Boost badges with ⚡ icon
+  - Checkered finish line (right side)
+- **Vote Panel** (28vh): All teams with flag, code, name, vote count, boost flash on click
+- **FINISH RACE button**: Floating green button
 
-### Root files
-- `index.html` - HTML entrypoint for the Vite app.
-- `package.json` - npm dependencies, scripts, and project metadata.
-- `README.md` - existing project overview and setup instructions.
-- `tsconfig.json` / `tsconfig.node.json` - TypeScript configuration for the app and build tooling.
-- `vite.config.ts` - Vite build and dev server configuration.
-- `project_status.md` - this file, describing current project state and structure.
+### 3. Data Model Updates
+- **Country interface**: `{ code: string, displayCode: string, name: string }`
+  - `code`: lowercase 2-letter ISO (matches asset filenames)
+  - `displayCode`: 3-letter code (USA, IND, GBR)
+  - `name`: Full country name
+- **Player interface**: `{ id, countryCode, displayCode, countryName, teamNumber, isReady }`
+- All mock data updated to use lowercase country codes
 
-### `public/`
-Contains static assets used by the app.
-- `countries.js` - likely mock or configuration data for supported countries.
-- `flags/country_flag/` - contains country flag PNGs named by 2-letter ISO code (lowercase)
-- `cars/rally_car_livery_sprites/` - contains car sprite assets for each country
-- `obstacles/` - contains obstacle images (banana, rock, oil) for the race scene
-- `sound/` - contains audio assets for the game
+### 4. Zustand Store Updates
+- `selectCountry(countryCode, teamNumber)` - fills team slot with country data
+- `removeCountry(teamNumber)` - clears team slot
+- `startRace()` - sets raceInProgress: true
+- `resetRace()` - resets to initial state
+- `voteForCountry(countryCode)` - increments vote count
+- `setCountdown(value)` - update countdown
+- `setWinner(countryCode)` - set winner and end race
 
-### `src/`
-The source folder for app code.
+### 5. UI Component Fixes
+- **NeonButton**: primary (green #22c55e), danger (red #c0213a), secondary, ghost variants
+- **CountdownTimer**: Magenta (#ff00aa) digits, removed inner card wrapper, inline label+digits
+- **CountryFlag**: Added `xl` (72×48), `banner` (24×16) size options
+- **GameHeader**: Restructured with `position: fixed` buttons anchored to screen corners, `game-header-btn` CSS classes
+- **SettingsPage**: Fixed button variant references
 
-#### `src/App.tsx`
-Main application shell with React Router setup for all pages.
+### 6. JSX Comment Cleanup
+- Removed all bare `/* */` comments from JSX text nodes across `App.tsx`, `main.tsx`, `GameBackground.tsx`, `GameHeader.tsx`, `LobbyPage.tsx`, `RacePage.tsx`
+- Only proper `{/* ... */}` JSX comments retained in .tsx files
 
-#### `src/main.tsx`
-Vite React entrypoint that renders the app into the DOM.
+### 7. Stadium Background Updated
+- Central spotlight (white→cyan→transparent) + two side cyan washes over dark navy gradient
 
-#### `src/index.css`
-Global CSS styles including:
-- CSS variables for color palette (--color-bg-primary, --color-neon-cyan, etc.)
-- Stadium gradient background (.bg-stadium)
-- Team grid and card styles
-- Infinite scroll banner animations
-- All lobby-specific styles with viewport-relative units
+---
 
-#### `src/components/layout/`
-Layout-level UI components used across pages.
-- `GameBackground.tsx` - Renders the stadium gradient background (variant: 'stadium' | 'track')
-- `GameHeader.tsx` - Top header with title, home/settings buttons
+## Design System
 
-#### `src/components/ui/`
-Reusable UI controls and visual components.
-- `CarSprite.tsx` - Renders car sprite for race, positioned by progress %
-- `CountdownTimer.tsx` - Countdown timer with magenta digits
-- `CountryFlag.tsx` - Displays flag PNG for a country (sizes: sm, md, lg, xl, banner, full)
-- `Dropdown.tsx` - Custom dropdown control
-- `GlowText.tsx` - Neon-style glowing text component
-- `NeonButton.tsx` - Neon-styled button (variants: primary/danger/secondary/ghost)
-- `NeonPanel.tsx` - Glass-effect panel container with glow borders
-- `Slider.tsx` - Custom slider control for settings
-- `ToggleSwitch.tsx` - Toggle control switch
+### Color Palette (CSS Variables)
+```css
+--color-bg-primary:      #050a1a   /* base background */
+--color-bg-secondary:    #0a1628   /* panels, cards */
+--color-bg-card:         #0d1f3c   /* slot/card background */
+--color-bg-card-hover:  #112447   /* hover state */
 
-#### `src/data/`
-- `mockData.ts` - All mock data including COUNTRIES array, MOCK_PLAYERS, MOCK_RACE_PARTICIPANTS, MOCK_LEADERBOARD, DEFAULT_SETTINGS
+--color-neon-cyan:       #00d4ff   /* primary accent */
+--color-neon-cyan-glow:  rgba(0, 212, 255, 0.3)
+--color-neon-magenta:    #ff00aa   /* countdown digits */
+--color-neon-gold:       #ffd700   /* winner, boost icon */
 
-#### `src/hooks/`
-- `useGameStore.ts` - Zustand store managing: players, countdown, raceInProgress, winner, settings, votes, selectedCountry, and actions like selectCountry, removeCountry, startRace, resetRace
+--color-text-primary:    #ffffff
+--color-text-secondary:  #94a3b8
+--color-text-accent:     #00d4ff
+--color-text-gold:       #ffd700
+```
 
-#### `src/lib/`
-- `utils.ts` - `cn()` utility for merging classNames
+### Typography
+- **Font**: Barlow Condensed (Google Fonts)
+- **Weights**: 400, 600, 700
+- **Style**: Uppercase, italic for titles
+- **Responsive**: All sizes use `clamp(min, preferred, max)`
 
-#### `src/pages/`
-Route pages that represent the main app screens.
-- `LeaderboardPage.tsx` - Shows winner display with laurel, top 5 podium, daily leaderboard sidebar, confetti
-- `LobbyPage.tsx` - **RECENTLY REDESIGNED** - Country selection, team slots, countdown, infinite banner
-- `RacePage.tsx` - Renders race track with lanes, car sprites, position progress, boost badges, vote panel
-- `SettingsPage.tsx` - Tabbed settings (General, Audio, Display, Gameplay, Voting, Countries, Advanced)
+### Backgrounds (Pure CSS, no images)
+```css
+.bg-stadium {
+  background:
+    radial-gradient(ellipse 40% 60% at 15% 0%, rgba(0, 150, 255, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 85% 0%, rgba(0, 150, 255, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0, 80, 180, 0.15) 0%, transparent 60%),
+    linear-gradient(180deg, #0a1628 0%, #050a1a 60%, #020710 100%);
+}
+```
 
-#### `src/types/`
-- `index.ts` - TypeScript interfaces: Country, Player, RaceParticipant, LeaderboardEntry, RaceResult, GameSettings
+---
 
-## Asset Conventions
+## Asset Specifications
 
 ### Flags
-- Path: `/flags/country_flag/{countryCode}.png`
-- Country codes are lowercase 2-letter ISO (e.g., `us.png`, `in.png`)
-- Display codes are 3-letter (e.g., "USA", "IND")
+```
+Path:     /flags/country_flag/{code}.png
+Example:  /flags/country_flag/us.png, /flags/country_flag/in.png
+Codes:    lowercase 2-letter ISO (us, in, gb, jp, etc.)
+Sizes:    sm (32×22), md (48×32), lg (80×53), xl (72×48), banner (24×16), full (240×160)
+```
 
-### Cars
-- Path: `/cars/rally_car_livery_sprites/{countryCode}.png`
-- Country codes are lowercase
+### Car Sprites
+Two types available:
+```
+F1:   /cars/f1_car_livery_sprites/{code}.png
+Rally: /cars/rally_car_livery_sprites/{code}.png
+Example: /cars/rally_car_livery_sprites/us.png
+Size: ~80px wide, ~48px tall (top-down sprite)
+Current usage: RacePage uses rally_car_livery_sprites
+```
 
-### State Flow
-1. User selects country from banner/selector → `selectCountry()` in store
-2. Country fills next empty team slot in `players` array
-3. Click on filled team card → `removeCountry()` clears that slot
-4. START RACE → navigates to `/race` with current players
-5. RESET TIMER → resets countdown to 60
+### Obstacles
+```
+Path:     /obstacles/obstacle-{type}.png
+Types:    banana (4-frame spritesheet), rock, oil
+Animation: banana spins with steps(4) over 0.4s
+```
+
+---
+
+## Zustand Store Structure
+
+### State
+```typescript
+{
+  currentPage: string
+  settings: GameSettings           // { masterVolume, musicVolume, soundEffects, fullscreenMode, ... }
+  players: Player[]                // 8 slots, isReady indicates filled/empty
+  raceParticipants: RaceParticipant[]  // 8 cars with progress, boosts, position
+  leaderboard: LeaderboardEntry[]  // 10 entries with rank, countryCode, countryName, wins
+  votes: Record<string, number>    // countryCode -> vote count
+  countdown: number                // seconds remaining (starts at 60)
+  raceInProgress: boolean
+  winner: string | null
+  selectedCountry: string
+}
+```
+
+### Available Actions
+```typescript
+setPage(page)
+updateSettings(settings)
+resetSettings()
+selectCountry(countryCode, teamNumber)
+removeCountry(teamNumber)
+startRace()
+resetRace()
+voteForCountry(countryCode)
+setCountdown(value)
+setWinner(countryCode)
+```
+
+---
+
+## Mock Data
+
+### COUNTRIES (24 total)
+| Code | Display | Name |
+|------|---------|------|
+| us | USA | United States |
+| in | IND | India |
+| cn | CHN | China |
+| gb | GBR | United Kingdom |
+| jp | JPN | Japan |
+| de | GER | Germany |
+| fr | FRA | France |
+| ca | CAN | Canada |
+| au | AUS | Australia |
+| br | BRA | Brazil |
+| ar | ARG | Argentina |
+| es | ESP | Spain |
+| ... | ... | ... (12 more) |
+
+### MOCK_RACE_PARTICIPANTS
+8 participants with position, progress (0-100), boosts count
+
+### MOCK_LEADERBOARD
+10 entries ranked by wins (1-10)
+
+### MOCK_VOTES
+Sample vote distribution across countries
+
+### DEFAULT_SETTINGS
+```typescript
+{
+  masterVolume: 80,
+  musicVolume: 65,
+  soundEffects: 90,
+  fullscreenMode: true,
+  showCountryFlags: true,
+  raceCountdownDuration: 60,
+  maxPlayers: 8,
+  defaultCountry: 'IN',
+  enableConfetti: true
+}
+```
+
+---
+
+## Page Responsibilities
+
+| Page | Route | Features |
+|------|-------|----------|
+| LobbyPage | `/lobby` | Country selection, 8 team slots, countdown, infinite banner |
+| RacePage | `/race` | Track with 8 lanes, car sprites, leader pill, vote panel |
+| LeaderboardPage | `/leaderboard` | Winner display, podium cards, daily leaderboard, confetti |
+| SettingsPage | `/settings` | 7 tabs (General, Audio, Display, Gameplay, Voting, Countries, Advanced) |
+
+---
+
+## Application Routes
+
+```typescript
+type PageRoute = '/' | '/lobby' | '/race' | '/leaderboard' | '/settings'
+```
+
+---
+
+## Design Conventions
+
+### Responsive Design
+- **Primary target**: 1920×1080
+- **Secondary**: 1280×720, 1440×900, 1366×768
+- **Minimum**: 1280px (no mobile support)
+- **Method**: `clamp()` for all sizes, flexbox with `flex: 1`, CSS Grid with `fr` units
+
+### Naming Conventions
+- Components: PascalCase (CarSprite.tsx)
+- Hooks: camelCase with `use` prefix (useGameStore.ts)
+- CSS classes: kebab-case
+- Country codes: lowercase 2-letter ISO
+
+### Key Rules
+- NO inline styles
+- NO prop-drilling (use Zustand)
+- NO hardcoded country lists (use mockData.ts)
+- NO `px` for layout dimensions
+- NO background images (CSS only)
+- All text labels uppercase
+- Font: Barlow Condensed, uppercase, letter-spacing 0.05em
+
+---
+
+## Project Structure
+
+```
+race_of_nations/
+├── public/
+│   ├── countries.js
+│   ├── flags/country_flag/     # 100+ flag PNGs
+│   ├── cars/
+│   │   ├── f1_car_livery_sprites/  # F1 car sprites
+│   │   └── rally_car_livery_sprites/  # Rally car sprites
+│   ├── obstacles/              # banana.png, rock.png, oil.png
+│   └── sound/                  # audio assets
+├── src/
+│   ├── App.tsx                 # Router setup
+│   ├── main.tsx                # React entrypoint
+│   ├── index.css               # Global CSS, variables, all component styles
+│   ├── components/
+│   │   ├── layout/
+│   │   │   ├── GameBackground.tsx  # stadium/track gradient variants
+│   │   │   └── GameHeader.tsx      # shared header (not currently used in redesigned pages)
+│   │   └── ui/
+│   │       ├── CarSprite.tsx
+│   │       ├── CountdownTimer.tsx
+│   │       ├── CountryFlag.tsx
+│   │       ├── Dropdown.tsx
+│   │       ├── GlowText.tsx
+│   │       ├── NeonButton.tsx
+│   │       ├── NeonPanel.tsx
+│   │       ├── Slider.tsx
+│   │       └── ToggleSwitch.tsx
+│   ├── data/
+│   │   └── mockData.ts         # COUNTRIES, MOCK_PLAYERS, etc.
+│   ├── hooks/
+│   │   └── useGameStore.ts     # Zustand store
+│   ├── lib/
+│   │   └── utils.ts            # cn() utility
+│   ├── pages/
+│   │   ├── LobbyPage.tsx       # ✅ REDESIGNED
+│   │   ├── RacePage.tsx        # ✅ REDESIGNED
+│   │   ├── LeaderboardPage.tsx # TODO
+│   │   └── SettingsPage.tsx    # Partially done
+│   └── types/
+│       └── index.ts            # All TypeScript interfaces
+├── index.html
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+├── DESIGN.md                   # Visual design system
+├── lobby_design.md             # LobbyPage spec
+├── race.md                     # RacePage spec
+├── CLAUDE.md                   # Project instructions
+└── project_status.md           # This file
+```
+
+---
+
+## Game Flow
+
+```
+┌─────────┐  START RACE   ┌─────────┐  FINISH    ┌──────────────┐
+│ LobbyPage │ ──────────→  │ RacePage │ ────────→ │LeaderboardPage│
+│ (select)  │              │ (race)   │            │  (results)   │
+└─────────┘              └─────────┘            └──────────────┘
+      ↑                                                  │
+      └────────────── RESTART RACE ─────────────────────┘
+```
+
+1. **LobbyPage**: Select countries from banner/selector → fills team slots
+2. **RacePage**: View race with cars, leader, vote for boosts
+3. **LeaderboardPage**: See winner, podium, rankings
+4. **Back to LobbyPage**: Reset and play again
+
+---
 
 ## Potential Next Steps
 
 ### High Priority
-1. **RacePage Redesign** - Apply same viewport-relative scaling and visual polish to RacePage
-2. **LeaderboardPage Redesign** - Implement winner display with laurel SVGs, podium cards, confetti animation
-3. **SettingsPage Polish** - Ensure all 7 tabs are fully functional with proper controls
+1. **LeaderboardPage Redesign** - Winner with laurel SVGs, podium cards, confetti animation
+2. **SettingsPage Polish** - Complete all 7 tabs with working controls
+3. **Flag Asset Verification** - Confirm all 24 countries have PNG flags
 
 ### Medium Priority
-4. **Real PNG Flag Verification** - Ensure all flags in COUNTRIES array have corresponding PNG assets
-5. **Full Game Flow** - Connect all pages properly: Lobby → Race → Leaderboard → back to Lobby
-6. **Responsive Testing** - Verify UI scales correctly at 1920×1080, 1440×900, 1280×720
+4. **Full Game Flow** - Proper navigation and state reset between pages
+5. **Responsive Testing** - Verify UI at 1920×1080, 1440×900, 1280×720
+6. **Race Animation System** - Real car movement, obstacle hits, boost mechanics
 
 ### Lower Priority
-7. **Race Animation** - Implement smooth car movement with CSS transitions
-8. **Vote System UI** - Create polished boost/vote panel in RacePage
-9. **Sound Integration** - Wire up audio controls in Settings and game events
-10. **Backend Integration** - Replace mock data with real API endpoints when available
+7. **Sound Integration** - Audio controls and event sounds
+8. **Obstacle Visuals** - Banana/rock/oil sprite animations
+9. **Countdown Overlay** - 3-2-1-GO! before race
+10. **Backend Integration** - Replace mock data with API
+
+---
+
+## Files Modified Recently
+
+| File | Changes |
+|------|---------|
+| `src/pages/LobbyPage.tsx` | Complete rewrite, uses GameHeader, flag-fill cards, cleaned JSX comments |
+| `src/pages/RacePage.tsx` | Complete rewrite with track, lanes, vote panel, bg-track, cleaned JSX comments |
+| `src/index.css` | Lobby + race styles, stadium gradient, game-header, team-card-flag, banner fixes |
+| `src/data/mockData.ts` | Added displayCode, lowercase codes |
+| `src/hooks/useGameStore.ts` | Added removeCountry action |
+| `src/types/index.ts` | Added displayCode to interfaces |
+| `src/components/layout/GameHeader.tsx` | Restructured with fixed corner buttons |
+| `src/components/ui/GameBackground.tsx` | Cleaned JSX comments |
+| `src/components/ui/CountdownTimer.tsx` | Inline pill layout, cleaned JSX comments |
+| `src/components/ui/CountryFlag.tsx` | Added xl, banner sizes, object-contain fix |
+| `src/App.tsx` | Cleaned JSX comment leaks |
+| `src/main.tsx` | Fixed visible comment text |
+| `project_status.md` | This file, kept updated |

@@ -1,5 +1,7 @@
 # CLAUDE.md — Race of Nations
 
+you are a senoir frontend developer who is working on creating beautiful and elegant gaming webistes, you precisely follow the instructions and make sure to provide the desired results as closely as possible
+
 ## Project Overview
 `race_of_nations` is a browser-based multiplayer racing game frontend. Players select countries in a lobby, watch a real-time race with a boost/vote system, and see results on a leaderboard. Built as a polished static frontend — no live backend yet.
 
@@ -70,7 +72,7 @@ src/
 
 ### Styling
 - No inline styles — use CSS classes only
-- Background = pure CSS gradients (no background PNG) — see `design.md`
+- Background = pure CSS gradients (no background PNG) — see `DESIGN.md`
 - All text labels in game UI = uppercase
 - Responsive units: use `vw`, `vh`, `%`, `clamp()` — avoid fixed `px` for layout dimensions
 - Breakpoints: design for 1920×1080 primary, scale down to 1280×720
@@ -116,3 +118,13 @@ src/
 4. Redesign `RacePage.tsx`
 5. Redesign `LeaderboardPage.tsx`
 6. Redesign `SettingsPage.tsx`
+
+# Attached Screeshots
+I have attacked the sample screenshots of the target UI
+1. Lobbt Page - target\Lobby_page.png
+2. Race Page - target\Race_page.png
+3. Leaderboard Page - target\Leaderboard_page.png
+4. Settings Page - target\Settings_page.png
+
+---
+    

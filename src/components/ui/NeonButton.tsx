@@ -1,6 +1,11 @@
+/* ===== FILE: NeonButton.tsx ===== */
+/* Summary: A styled button with neon glow variants (primary/danger/secondary/ghost) and three sizes. */
+
 import { cn } from '@/lib/utils';
 import { type ReactNode } from 'react';
 
+/* ===== PROPS INTERFACE ===== */
+/* Summary: variant controls color scheme; size controls padding/font; icon adds a leading icon slot. */
 interface NeonButtonProps {
   children: ReactNode;
   variant?: 'primary' | 'danger' | 'secondary' | 'ghost';
@@ -11,6 +16,7 @@ interface NeonButtonProps {
   icon?: ReactNode;
 }
 
+/* ===== COMPONENT ===== */
 export function NeonButton({
   children,
   variant = 'primary',
@@ -20,6 +26,8 @@ export function NeonButton({
   disabled = false,
   icon,
 }: NeonButtonProps) {
+  /* ===== COLOR VARIANTS ===== */
+  /* Each variant defines background, text, border, and neon box-shadow with hover/active transitions. */
   const variants = {
     primary: 'bg-[#22c55e] text-white hover:bg-[#16a34a] border border-[#16a34a] shadow-[0_0_12px_rgba(34,197,94,0.4)] hover:shadow-[0_0_20px_rgba(34,197,94,0.6)] active:scale-[0.98]',
     danger: 'bg-[#dc2626] text-white hover:bg-[#b91c1c] border border-[#b91c1c] shadow-[0_0_12px_rgba(220,38,38,0.4)] hover:shadow-[0_0_20px_rgba(220,38,38,0.6)] active:scale-[0.98]',
@@ -27,6 +35,8 @@ export function NeonButton({
     ghost: 'bg-transparent text-[#8b9dc3] hover:text-white hover:bg-[rgba(255,255,255,0.05)] active:scale-[0.98]',
   };
 
+  /* ===== SIZE PRESETS ===== */
+  /* Padding and font-size scale across sm/md/lg. gap used for icon-text spacing. */
   const sizes = {
     sm: 'px-3 py-1.5 text-sm gap-1.5',
     md: 'px-5 py-2.5 text-base gap-2',
@@ -44,7 +54,7 @@ export function NeonButton({
         className
       )}
     >
-      {icon && <span className="flex-shrink-0">{icon}</span>}
+      {icon && <span className="flex-shrink-0">{icon}</span>}    /* Render icon before text if provided */
       {children}
     </button>
   );
